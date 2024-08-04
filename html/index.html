@@ -29,13 +29,22 @@
       <div id="highlighted_infoblock" style="pointer-events: none">
         <div class="highlightedTitle infoBlockSection">
           <div>
-            <span class="identLarge"><span id="highlighted_callsign">n/a</span></span>
+<!-- chg-s reduce hover dialog box size by oki098972 -->
+            <!-- <span class="identLightMedium"><span id="highlighted_callsign">n/a</span></span> -->
+            <span class="identLarge_hv"><span id="highlighted_callsign">n/a</span></span>
+<!-- chg-e reduce hover dialog box size by oki098972 -->
           </div>
           <div>
-            <span class="identSmall"><span id="highlighted_pf_route"></span></span>
+<!-- chg-s reduce hover dialog box size by oki098972 -->
+            <!-- <span class="identSmall"><span id="highlighted_pf_route"></span></span> -->
+            <span class="identMedium_hv"><span id="highlighted_pf_route"></span></span>
+<!-- chg-e reduce hover dialog box size by oki098972 -->
           </div>
         </div>
-        <div class="infoBlockSection">
+<!-- chg-s reduce hover dialog box size by oki098972 -->
+        <!-- <div class="infoBlockSection"> -->
+        <div class="infoBlockSection identSmall_hvdata">
+<!-- chg-e reduce hover dialog box size by oki098972 -->
           <div>
             <div class="infoHeading"><span>Reg.: </span></div>
             <div class="infoData"><span id="highlighted_registration">n/a</span></div>
@@ -80,7 +89,7 @@
             <div>
               <span class="identLarge" title="Callsign: Typically the air traffic control callsign or the aircraft's registration, as entered into the transponder by the pilot" id="selected_callsign">n/a</span>
             </div>
-            <div id="selected_icao" title="ICAO hex ID: The aircraft's unique ICAO identification number shown in hexadecimal format as set in the aircrafts transponder (can be wrong, we will still display the data with the wrong hex)">
+            <div id="selected_icao" title="ICAO hex ID: The aircraft's unique ICAO identification number shown in hexadecimal format as set in the aircrafts transponder (can be wrong, we will still display the pdata with the wrong hex)">
             </div>
             <div style="display: none" id="creditsSelected">
               <table class="infoSectionTable">
@@ -289,7 +298,7 @@
             <table class="infoSectionTable">
               <tr id=receiver_id_div class="infoBlockSection hidden">
                 <td>
-                  <span class="infoHeading" title="receiver id that supplied the position data">rId:</span>
+                  <span class="infoHeading" title="receiver id that supplied the position pdata">rId:</span>
                   <span class="infoData" id="receiver_id">n/a</span>
                 </td>
               </tr>
@@ -367,7 +376,7 @@
 
             <div>
               <div class="infoHeading">
-                <span title="Data source for the reported aircraft data (e.g., ADS-B, MLAT, Other Mode S)">Source</span>:
+                <span title="Data source for the reported aircraft pdata (e.g., ADS-B, MLAT, Other Mode S)">Source</span>:
               </div>
               <div class="infoData">
                 <span id="selected_source">n/a</span>
@@ -707,7 +716,7 @@
           </div>
 
           <div class="bottom-info-container">
-            <div class="bottom-info-text"> Learn more about Mode S data type by hovering over each data label.</div>
+            <div class="bottom-info-text"> Learn more about Mode S pdata type by hovering over each pdata label.</div>
           </div>
           <div>
               <div class="infoHeading">
@@ -781,6 +790,23 @@
               <div class="settingsText">Group by Data Type</div>
             </div>
           </div>
+<!-- ins-s add TraceHour param by oki098972 -->
+          <div>
+            <div class="infoBlockTitleText">航空機軌跡の表示範囲[H]:</div>
+            <!-- <input id="tracehour_input" name="tracehourBox" type="text" style="width: 30px" maxlength="3" title="入力した時間を遡った時刻から現在時刻までの航跡を表示"> -->
+            <input id="tracehour_input" name="tracehourBox" type="text" style="width: 30px" maxlength="3" title="入力した時間を遡った時刻から現在時刻までの航跡を表示">
+            <button type="button" onclick="setTraceHourparam();">Set</button>
+            <button type="button" onclick="getTraceHourparam();">Get</button>
+            <button type="button" onclick="resetTraceHourparam();">Set default</button>
+          </div>
+<!-- ins-e add TraceHour param by oki098972 -->
+<!-- ins-s add 通報簡略化 param by oki098972 -->
+          <div>
+            <input id="townname_input" name="townnameBox" type="text" style="width: 300px; margin-top: 5px;" maxlength="100" title="投稿に表示する部落名等を入力">
+            <button type="button" onclick="setTownname();">Set</button>
+            <button type="button" onclick="getTownname();">Get</button>
+          </div>
+<!-- ins-e add 通報簡略化 param by oki098972 -->
         </div>
         <div style="display: none" id="credits">
           <span class=credits-image></span>
@@ -788,11 +814,21 @@
         </div>
         <div id="header_top" class="infoHeading">
           <div class="buttonContainer">
+<!-- ins-s move button start param by oki098972 -->
+            <span id="L" title="Toggle (L)abels" class="button inActiveButton" onclick="toggleLabels();"><span class="buttonText">L</span></span>
+            <span id="O" title="Toggle Label Extensi(O)ns" class="button inActiveButton" onclick="toggleExtendedLabels();"><span class="buttonText">O</span></span>
+            <span id="K" title="Toggle Trac(K) Labels" class="button inActiveButton" onclick="toggleTrackLabels();"><span class="buttonText">K</span></span>
+<!-- ins-e move button start param by oki098972 -->
             <span id="U" title="only show the U2 and other military planes" class="button inActiveButton" onclick="toggleMilitary();"><span class="buttonText">U</span></span>
             <span id="H" title="(H)ome / Reset Map" class="button inActiveButton" onclick="resetMap();"><span class="buttonText">H</span></span>
             <span id="T" title="All (T)racks" class="button inActiveButton" onclick="selectAllPlanes();"><span class="buttonText">T</span></span>
+<!-- ins-s add clock by oki098972 -->
+            <span title="current time" id="header_top_time" class="bClockText"></span>
+<!-- ins-e add clock by oki098972 -->
           </div>
         </div>
+<!-- del-s move button start param by oki098972 -->
+        <!--
         <div id="header_side" class="infoHeading">
           <div class="buttonContainer">
             <div id="toggle_sidebar_control">
@@ -821,12 +857,39 @@
             </div>
             <div id="R" title="Follow a (R)andom plane!" class="button inActiveButton" onclick="followRandomPlane();"><span class="buttonText">R</span></div>
             <div id="F" title="(F)ollow" class="button inActiveButton" onclick="toggleFollow();"><span class="buttonText">F</span></div>
+        -->
           <!--< div id="RP" title="Replay" class="button inActiveButton" onclick="showReplayBar();"><span class="buttonText">RP</span></div>-->
+        <!--
           </div>
         </div>
+        -->
+<!-- del-e move button by oki098972 -->
         <div id="altitude_chart" class="ol-unselectable ol-control altitudeFeet">
           <button id="altitude_chart_button"></button>
         </div>
+<!-- ins-s reduce hover dialog box size by oki098972 -->
+        <div class="ol-unselectable ol-control" style="float: left; width: 145px; bottom: 0px; left: 140px !important; font-size: 10px; background-color: transparent;">
+          <table cellspacing="0" cellpadding="0">
+            <tr>
+              <td rowspan="2">表示位置</td>
+              <td>
+                <label for="hover_pos_LU">左上</label>
+                <input type="radio" id="hover_pos_LU" name="hover_position" value="h_LU" />
+                <label for="hover_pos_RU">右上</label>
+                <input type="radio" id="hover_pos_RU" name="hover_position" value="h_RU" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="hover_pos_LD">左下</label>
+                <input type="radio" id="hover_pos_LD" name="hover_position" value="h_LD" />
+                <label for="hover_pos_RD">右下</label>
+                <input type="radio" id="hover_pos_RD" name="hover_position" value="h_RD" checked/>
+              </td>
+            </tr>
+          </table>
+        </div>
+<!-- ins-e reduce hover dialog box size by oki098972 -->
         <div id="replayBar">
           <button id="replayPlay" >Play</button>
           <p id="replayDateHint" >Date:</p>
@@ -889,7 +952,7 @@
 
               <tr class="infoblock_heading">
                 <td style="text-align: right" class=link>
-                  <a href="https://github.com/wiedehopf/tar1090#tar1090" id="tar1090_version" target="_blank">tar1090 on github</a>
+                  <a href="https://github.com/wiedehopf/tar1090#tar1090" id="tar1090_version" target="_blank">tar1090 on github (3.14.1658)</a>
                 </td>
               </tr>
               <tr class="rSpacer">
@@ -932,9 +995,19 @@
 
             <div id="tabs" style="min-height: 10px; overflow: auto">
               <ul>
-                <li><a href="#tab-search">Search</a></li>
-                <li><a href="#tab-filters">Filters</a></li>
-                <li><a href="#tab-columns">Columns</a></li>
+<!-- ins-s add Clock by oki098972 -->
+                <li><div style="display: flex; align-items: flex-end; min-width: 180px; height: 28px; margin-left: 5px; margin-right: 5px;">
+                    <p id="add_sp_time" style="margin: 0;"></p>
+                </div></li>
+<!-- ins-e add Clock by oki098972 -->
+<!-- chg-s Change Layout by oki098972 -->
+                <!-- <li><a href="#tab-search">Search</a></li> -->
+                <!-- <li><a href="#tab-filters">Filters</a></li> -->
+                <!-- <li><a href="#tab-columns">Columns</a></li> -->
+                <li><a href="#tab-search">Sch</a></li>
+                <li><a href="#tab-filters">Fil</a></li>
+                <li><a href="#tab-columns">Col</a></li>
+<!-- chg-e Change Layout by oki098972 -->
               </ul>
               <div id="tab-search">
                 <table id="tab-search-table" cellpadding="0" cellspacing="0">
@@ -1041,11 +1114,51 @@
         </div> <!-- sidebar_canvas -->
 
       </div> <!-- sidebar_container -->
+<!-- ins-s move button by oki098972 -->
+        <div id="header_side" class="infoHeading">
+          <div class="buttonContainer" style="position:fixed; right:15px; width:30px;">
+            <div id="toggle_sidebar_control">
+              <button id="toggle_sidebar_button" class="show_sidebar sidebar_button " title="Toggle Sidebar"></button>
+            </div>
+            <div id="expand_sidebar_control">
+              <button id="expand_sidebar_button" class="sidebar_button" title="Expand Sidebar" style="display: none;"></button>
+            </div>
+            <div id="fullscreenButton" class="svgButton fullscreenButton"></div>
+            <div id="settingsCog" class="svgButton settingsCog"></div>
+            <div class="buttonSpacer">
+            </div>
+          </div>
+          <div class="buttonContainer" style="position:fixed; top:280px; right:15px; width:30px;">
+            <div style="display: none" id="B" title="Toggle Map (B)rightness" class="button inActiveButton" onclick="toggles['MapDim'].toggle();"><span class="buttonText">B</span></div>
+            <div class="buttonSpacer">
+            </div>
+            <div style="display: none" id="V" title="Table: only show aircraft in current (V)iew" class="button inActiveButton" onclick="toggleTableInView();"><span class="buttonText">V</span></div>
+            <div id="M" title="Toggle (M)ultiSelect" class="button inActiveButton" onclick="toggleMultiSelect();"><span class="buttonText">M</span></div>
+            <div class="buttonSpacer">
+            </div>
+            <div id="P" title="(P)ersistence mode" class="button inActiveButton" onclick="togglePersistence();"><span class="buttonText">P</span></div>
+            <div id="I" title="(I)solate: only show selected aircraft" class="button inActiveButton" onclick="toggleIsolation();"><span class="buttonText">I</span></div>
+            <div class="buttonSpacer">
+            </div>
+            <div id="R" title="Follow a (R)andom plane!" class="button inActiveButton" onclick="followRandomPlane();"><span class="buttonText">R</span></div>
+            <div id="F" title="(F)ollow" class="button inActiveButton" onclick="toggleFollow();"><span class="buttonText">F</span></div>
+          <!--< div id="RP" title="Replay" class="button inActiveButton" onclick="showReplayBar();"><span class="buttonText">RP</span></div>-->
+          </div>
+        </div>
+<!-- ins-e move button by oki098972 -->
+<!-- ins-s add 通報簡略化 param by oki098972 -->
+        <div class="buttonModalBoOut">
+            <button class="buttonModalBo" id="modal-button2">Table<BR>sel.</button>
+            <button class="buttonModalBo" id="modal-button">Post<BR>str.</button>
+            <button class="buttonModalBo" id="modal-button3">DNA/FTM<BR>near?</button>
+            <button class="buttonModalBo" id="modal-button4">deselect<BR>All planes</button>
+        </div>
+<!-- ins-e add 通報簡略化 param by oki098972 -->
 
     </div> <!-- layout_container -->
 
     <div id="update_error" class="hidden error_box">
-      Problem fetching data from the server:<br>
+      Problem fetching pdata from the server:<br>
       <span id="update_error_detail"></span>
     </div>
 
@@ -1061,7 +1174,7 @@
     <div id="js_error" class="hidden"></div>
     <div id="container_splitter"></div>
 
-    <script>let databaseFolder = "db2";</script>
+    <script>let databaseFolder = "db-39a2276";</script>
     <!-- JS_ANCHOR1 -->
     <script src="libs/jquery-3.6.1.min.js"></script>
     <script src="libs/elm-pep-01.js"></script>
@@ -1089,7 +1202,46 @@
     <script src="planeObject.js"></script>
     <script src="script.js"></script>
 
-    <link rel="preload" as="image" crossOrigin="anonymous" href="images/sprites.png">
+<!-- ins-s add Clock by oki098972 -->
+    <script>
+        function show_current_time() {
+            let current_time = new Date();
+            //document.getElementById("add_sp_time").innerHTML = current_time.toLocaleTimeString("ja");
+            document.getElementById("header_top_time").innerHTML = current_time.toLocaleString("ja");
+        }
+        setInterval('show_current_time()',1000);
+    </script>
+<!-- ins-e add Clock by oki098972 -->
+
+<!-- ins-s add 通報簡略化 param by oki098972 -->
+    <script>
+        document.querySelector('#modal-button').addEventListener('click', Write_tweetstr);
+        document.querySelector('#modal-button3').addEventListener('click', ListUpPlaneFromToMilAirport);
+        document.querySelector('#modal-button2').addEventListener('click', SelectTablesPlane_or_DispPlaneTimeslot);
+        document.querySelector('#modal-button4').addEventListener('click', deselectAllPlanes);
+    </script>
+
+    <dialog id="bs_dialog">
+        <div id="bs_message" style="font-size: 14px;"></div>
+        <form name="popupForm" class="bsPopupForm" style="margin-top:30px; font-size: 12px;">
+            <label for="id_timerg_1"><input type="radio" name="timerange" id="id_timerg_1" value="0"><span id="lbid_timerg_1"></span></label>
+            <label for="id_timerg_1"><input type="radio" name="timerange" id="id_timerg_2" value="1"><span id="lbid_timerg_2"</span></label>
+            <label for="id_timerg_1"><input type="radio" name="timerange" id="id_timerg_3" value="2"><span id="lbid_timerg_3"</span></label>
+            <label for="id_timerg_1"><input type="radio" name="timerange" id="id_timerg_4" value="3"><span id="lbid_timerg_4"</span></label>
+            <label for="id_timerg_1"><input type="radio" name="timerange" id="id_timerg_5" value="4"><span id="lbid_timerg_5"</span>選択不可</label>
+            <label for="id_timerg_1"><input type="radio" name="timerange" id="id_timerg_6" value="5"><span id="lbid_timerg_6"</span>選択不可</label>
+            <label for="id_timerg_1"><input type="radio" name="timerange" id="id_timerg_7" value="6"><span id="lbid_timerg_7"</span>選択不可</label>
+            <label for="id_timerg_1"><input type="radio" name="timerange" id="id_timerg_8" value="7"><span id="lbid_timerg_8"</span>選択不可</label>
+            <label for="id_timerg_1"><input type="radio" name="timerange" id="id_timerg_9" value="8"><span id="lbid_timerg_9"</span>選択不可</label>
+        </form>                               
+        <p>上の時間範囲のデータを表示する際には、ラジオボタンを選択して「Chg URL」ボタンを押して下さい。</p>
+        <button id="bs_button-ok" style="width:60px; height:30px; margin-top:30px; margin-right:20px; padding:0; font-size: 14px;">ＯＫ</button>
+        <button id="bs_button-cancel" style="width:60px; height:30px; margin-top:30px; margin-right:20px; padding:0; font-size: 14px;">Cancel</button>
+        <button id="bs_button-changeurl" style="width:100px; height:30px; margin-top:30px; margin-left:40px; padding:0; font-size: 14px;">Chg URL</button>
+    </dialog>
+<!-- ins-e add 通報簡略化 param by oki098972 -->
+
+    <link rel="preload" as="image" crossOrigin="anonymous" href="images/sprites_f0c84e57a9cf2e424887b81bcd5b8a7f.png">
 
   </body>
 </html>

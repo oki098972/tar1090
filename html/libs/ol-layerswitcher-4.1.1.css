@@ -1,7 +1,9 @@
 .layer-switcher {
   position: absolute;
   top: 3.5em;
-  right: 0.5em;
+/* chg-s move layer-switcher by oki098972 */
+  /* right: 0.5em; */
+/* chg-e move layer-switcher by oki098972 */
   text-align: left;
 }
 
@@ -18,7 +20,10 @@
 }
 
 .layer-switcher button {
-  float: right;
+/* chg-s move layer-switcher by oki098972 */
+  /* float: right; */
+  float: left;
+/* chg-e move layer-switcher by oki098972 */
   z-index: 1;
   width: 38px;
   height: 38px;

@@ -85,6 +85,10 @@ let tfrOpacity = 0.70;
 
 let offlineMapDetail = -1;
 
+//ins-s force display aircraft labels by oki098972
+let fdispLabels = false;
+//ins-e force display aircraft labels by oki098972
+
 // -- Marker settings -------------------------------------
 // (marker == aircraft icon)
 
@@ -262,6 +266,9 @@ let labelZoom = 0;
 let labelZoomGround = 14.8;
 
 let labelFont = 'bold 12px tahoma';
+//ins-s 航跡に出す文字を小さくする by oki098972
+let labelFont2 = 'bold 12px tahoma';
+//ins-e 航跡に出す文字を小さくする by oki098972
 
 let displayUATasADSB = false;
 let uatNoTISB = false;

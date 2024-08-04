@@ -832,7 +832,10 @@ PlaneObject.prototype.updateIcon = function() {
     let svgKey  = fillColor + '!' + this.shape.name + '!' + this.strokeWidth;
     let labelText = null;
 
-    if ( enableLabels && (!multiSelect || (multiSelect && this.selected)) &&
+//chg-s force display aircraft labels by oki098972
+    //if ( enableLabels && (!multiSelect || (multiSelect && this.selected)) &&
+    if ( fdispLabels || enableLabels && (!multiSelect || (multiSelect && this.selected)) &&
+//chg-e force display aircraft labels by oki098972
         (
             (zoomLvl >= labelZoom && this.altitude != "ground")
             || (zoomLvl >= labelZoomGround - 2 && this.speed > 5 && !this.fakeHex)
@@ -842,12 +845,28 @@ PlaneObject.prototype.updateIcon = function() {
         )
     ) {
         let callsign = "";
-        if (this.flight && this.flight.trim())
-            callsign =  this.flight.trim();
-        else if (this.registration)
-            callsign =  'reg: ' + this.registration;
-        else
-            callsign =   'hex: ' + this.icao;
+//chg-s Aircraft Label always ICAO code by oki098972
+        //if (this.flight && this.flight.trim())
+        //    callsign =  this.flight.trim();
+        //else if (this.registration)
+        //    callsign =  'reg: ' + this.registration;
+        //else
+        //    callsign =   'hex: ' + this.icao;
+        callsign = this.icao.toUpperCase();
+//chg-e Aircraft Label always ICAO code by oki098972
+//ins-s Aircraft Label always ICAO code by oki098972
+        let tmp_typestr = "";
+        if (!this.typeLong) {
+            tmp_typestr = 'N/A';
+        } else {
+            tmp_typestr = get_aircraftmodelstr(this.typeLong);
+        }
+        if (tmp_typestr == 'N/A' && !(!this.icaoType)) {
+            callsign += '\n' + this.icaoType;
+        } else {
+            callsign += '\n' + tmp_typestr;
+        }
+//ins-e Aircraft Label always ICAO code by oki098972
         if (useRouteAPI && this.routeString)
             callsign += ' - ' + this.routeString;
 
@@ -882,7 +901,7 @@ PlaneObject.prototype.updateIcon = function() {
             }
             if (this.wd != null) {
                 if (showLabelUnits) {
-                    labelText += format_track_arrow((this.wd + 180 % 360)) + NBSP + this.wd + '°' + NBSP;
+                    labelText += format_track_arrow((this.wd + 180 % 360)) + NBSP + this.wd + '属' + NBSP;
                     labelText += format_speed_long(this.ws, DisplayUnits);
                 } else {
                     labelText += format_track_arrow((this.wd + 180 % 360)) + NBSP + this.wd + NBSP;
@@ -964,10 +983,17 @@ PlaneObject.prototype.updateIcon = function() {
                     text: labelText,
                     fill: labelFill,
                     backgroundFill: bgFill,
-                    stroke: labelStrokeNarrow,
+//chg-s 航跡に出す文字を小さくする by oki098972
+                    //stroke: labelStrokeNarrow,
+                    stroke: labelStrokeNarrow2,
+//chg-e 航跡に出す文字を小さくする by oki098972
                     textAlign: 'left',
                     textBaseline: labels_top ? 'bottom' : 'top',
-                    font: labelFont,
+//chg-s 航跡に出す文字を小さくする by oki098972
+                    //font: labelFont,
+                    font: labelFont2,
+                    opacity: 1,
+//chg-e 航跡に出す文字を小さくする by oki098972
                     offsetX: (this.shape.w *0.5*0.74*this.scale),
                     offsetY: labels_top ? (this.shape.w *-0.3*0.74*this.scale) : (this.shape.w *0.5*0.74*this.scale),
                     padding: [1, 0, -1, 2],
@@ -1924,8 +1950,22 @@ PlaneObject.prototype.updateLines = function() {
 
     // create any missing fixed line features
 
+//ins-s add TraceHour param by oki098972
+    let currentTime = new Date().getTime()/1000;
+    let tmp_hour;
+    if ( TraceHour ) {
+        tmp_hour = TraceHour;
+    } else {
+        tmp_hour = Number(8);
+    }
+//ins-e add TraceHour param by oki098972
     for (let i = this.track_linesegs.length-1; i >= 0; i--) {
         let seg = this.track_linesegs[i];
+//ins-s add TraceHour param by oki098972
+        if (currentTime - seg.ts > tmp_hour * 3600) { //TraceHour(単位は時間)より前のデータは捨てる
+            continue;
+        }
+//ins-e add TraceHour param by oki098972
         if (seg.feature && (!trackLabels || seg.label))
             break;
 
@@ -2003,8 +2043,12 @@ PlaneObject.prototype.updateLines = function() {
             }
 
             let text =
-                speedString.padStart(3, NBSP) + "  "
+//chg-s add 速度高度を二行で表示 by oki098972
+                //speedString.padStart(3, NBSP) + "  "
+                //+ altString.padStart(6, NBSP)
+                speedString.padStart(3, NBSP) + "\n"
                 + altString.padStart(6, NBSP)
+//chg-e add 速度高度を二行で表示 by oki098972
                 + "\n"
                 //+ NBSP + format_track_arrow(seg.track)
                 + timestamp1 + timestamp2;
@@ -2015,7 +2059,10 @@ PlaneObject.prototype.updateLines = function() {
             if (showTrace && !trackLabels)
                 text = timestamp1 + timestamp2;
 
-            let fill = labelFill;
+//chg-s 航跡に出す文字を小さくする by oki098972
+            //let fill = labelFill;
+            let fill = blackFill;
+//chg-e 航跡に出す文字を小さくする by oki098972
             let zIndex = -i - 50 * (seg.alt_real == null);
             if (seg.leg == 'start') {
                 fill = new ol.style.Fill({color: '#88CC88' });
@@ -2031,13 +2078,19 @@ PlaneObject.prototype.updateLines = function() {
                     text: new ol.style.Text({
                         text: `${text}`,
                         fill: fill,
-                        stroke: labelStroke,
+//chg-s 航跡に出す文字を小さくする by oki098972
+                        //stroke: labelStroke,
+                        //stroke: labelStrokeNarrow,
+//chg-e 航跡に出す文字を小さくする by oki098972
                         textAlign: 'left',
                         //backgroundFill: bgFill,
                         textBaseline: otherDiag ? 'bottom' : 'top',
                         font: labelFont,
                         offsetX: (otherDiag ? 4 : 8) * globalScale,
                         offsetY: (otherDiag ? -4 : 8) * globalScale,
+//chg-s 航跡に出す文字を減らす by oki098972
+                        padding: [10, 0, 10, 0],
+//chg-e 航跡に出す文字を減らす by oki098972
                     }),
                     image: new ol.style.Circle({
                         radius: 2 * globalScale,
@@ -2991,3 +3044,27 @@ function normalizeTraceStamps(data) {
     data.timestamp = 0;
     return data;
 }
+//ins-s Aircraft Label always ICAO code by oki098972
+function get_aircraftmodelstr(str_arg) {
+    let str_tmp = 'N/A';
+    if (str_arg != null) {
+        let array_typestr = str_arg.split(' ');
+        for (let i = 0; i < array_typestr.length; i++) {
+            if (array_typestr[i].toUpperCase().indexOf("MCDONNELL") !== -1) {
+                //社名が入ってるので除外
+                continue;
+            }
+            if (array_typestr[i].toUpperCase().indexOf("BOEING") !== -1) {
+                //社名が入ってるので除外
+                continue;
+            }
+            if (array_typestr[i].search(/[\-]/) != -1) {
+                //ダッシュがあればそれを型名とする
+                str_tmp = array_typestr[i];
+                break;
+            }
+        }
+    }
+    return str_tmp;
+}
+//ins-e Aircraft Label always ICAO code by oki098972

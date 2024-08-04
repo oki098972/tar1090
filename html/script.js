@@ -1,5 +1,5 @@
-// Some global variables are defined in early.js
-// early.js takes care of getting some history files while the html page and
+// Some global variables are defined in early_a57875c8186f5db16d5ef3febcde65f0.js
+// early_a57875c8186f5db16d5ef3febcde65f0.js takes care of getting some history files while the html page and
 // some javascript libraries are still loading, hopefully speeding up loading
 
 
@@ -105,6 +105,9 @@ let labelFill = null;
 let blackFill = null;
 let labelStroke = null;
 let labelStrokeNarrow = null;
+//ins-s 航跡に出す文字を小さくする by oki098972
+let labelStrokeNarrow2 = null;
+//ins-e 航跡に出す文字を小さくする by oki098972
 let bgFill = null;
 let legSel = -1;
 let geoMag = null;
@@ -1933,6 +1936,12 @@ function parseHistory() {
             if (g.refreshHistory && now > data.now) {
                 continue;
             }
+//ins-s add pTracks start param by oki098972
+            //pTracksEndが与えられていたら以降のデータははじく
+            if (pTracksEnd && currentTime - data.now < pTracksEnd * 3600) {
+                continue;
+            }
+//ins-e add pTracks start param by oki098972
 
             // process new data
             if (PositionHistoryBuffer.length < 10) {
@@ -2174,7 +2183,7 @@ function webglAddLayer() {
         alt_baro: 25000, });
     let plane = g.planes['~c0ffee'];
 
-    let spriteSrc = spritesDataURL ? spritesDataURL : 'images/sprites.png';
+    let spriteSrc = spritesDataURL ? spritesDataURL : 'images/sprites_f0c84e57a9cf2e424887b81bcd5b8a7f.png';
     //console.log(spriteSrc);
     try {
         let glStyle = {
@@ -2765,6 +2774,19 @@ function initMap() {
             buttonActive('#B', state);
         }
     });
+
+//ins-s force display aircraft labels by oki098972
+    new Toggle({
+        key: "fdispLabels",
+        display: "ラベルを強制表示する",
+        container: "#settingsLeft",
+        init: false,
+        setState: function(state) {
+            fdispLabels = state;
+            remakeTrails();
+        }
+    });
+//ins-e force display aircraft labels by oki098972
 
     window.addEventListener('keydown', function(e) {
         active();
@@ -3585,18 +3607,48 @@ function refreshHighlighted() {
     let mapSize = OLMap.getSize();
     let infoBoxLeft = markerPosition[0];
     let infoBoxTop = markerPosition[1];
-    if ((infoBoxLeft + 20 + infoBox.width()) < mapSize[0])
-        infoBoxLeft += 20;
-    else if ((infoBoxLeft - 20 - infoBox.width()) > 0)
-        infoBoxLeft -= (20 + infoBox.width());
-    else
-        infoBoxLeft = 0;
-    if ((infoBoxTop + 20 + infoBox.height()) < mapSize[1])
-        infoBoxTop += 20;
-    else if (infoBoxTop - (20 + infoBox.height()) > 0)
-        infoBoxTop -= (20 + infoBox.height());
-    else
-        infoBoxTop = 0;
+/* chg-s reduce hover dialog box size by oki098972 */
+    //if ((infoBoxLeft + 20 + infoBox.width()) < mapSize[0])
+    //    infoBoxLeft += 20;
+    //else if ((infoBoxLeft - 20 - infoBox.width()) > 0)
+    //    infoBoxLeft -= (20 + infoBox.width());
+    //else
+    //    infoBoxLeft = 0;
+    //if ((infoBoxTop + 20 + infoBox.height()) < mapSize[1])
+    //    infoBoxTop += 20;
+    //else if (infoBoxTop - (20 + infoBox.height()) > 0)
+    //    infoBoxTop -= (20 + infoBox.height());
+    //else
+    //    infoBoxTop = 0;
+  {
+    let elements_hp = document.getElementsByName('hover_position');
+    let len_hp = elements_hp.length;
+    let val_hp = '';
+    for (let i = 0; i < len_hp; i++){
+        if (elements_hp.item(i).checked){
+            val_hp = elements_hp.item(i).value;
+        }
+    }
+    switch (val_hp) {
+      case 'h_LU': //左上
+        infoBoxLeft -= (15 + infoBox.width());
+        infoBoxTop -= (15 + infoBox.height());
+        break;
+      case 'h_LD': //左下
+        infoBoxLeft -= (15 + infoBox.width());
+        infoBoxTop += 15;
+        break;
+      case 'h_RU': //右上
+        infoBoxLeft += 15;
+        infoBoxTop -= (15 + infoBox.height());
+        break;
+      default: //デフォルトは右下
+        infoBoxLeft += 10;
+        infoBoxTop += 10;
+        break;
+    }
+  }
+/* chg-e reduce hover dialog box size by oki098972 */
     infoBox.css("left", infoBoxLeft);
     infoBox.css("top", infoBoxTop);
 
@@ -3747,13 +3799,19 @@ function refreshFeatures() {
         sort: function () { sortBy('registration', compareAlpha, function(x) { return x.registration; }); },
         value: function(plane) { return (flightawareLinks ? getFlightAwareIdentLink(plane.registration, plane.registration) : (plane.registration ? plane.registration : "")); },
         html: flightawareLinks,
-        text: 'Registration' };
+//chg-s Change Layout by oki098972
+        //text: 'Registration' };
+        text: 'Reg.' };
+//chg-e Change Layout by oki098972
     cols.aircraft_type = {
         sort: function () { sortBy('type', compareAlpha, function(x) { return x.icaoType; }); },
         value: function(plane) { return (plane.icaoType != null ? plane.icaoType : ""); },
         text: 'Type' };
     cols.squawk = {
-        text: 'Squawk',
+//chg-s Change Layout by oki098972
+        //text: 'Squawk',
+        text: 'Sqwk',
+//chg-e Change Layout by oki098972
         sort: function () { sortBy('squawk', compareAlpha, function(x) { return x.squawk; }); },
         value: function(plane) { return (plane.squawk != null ? plane.squawk : ""); },
         align: 'right' };
@@ -3762,14 +3820,20 @@ function refreshFeatures() {
         sort: function () { sortBy('altitude',compareNumeric, function(x) { return (x.altitude == "ground" ? -100000 : x.altitude); }); },
         value: function(plane) { return format_altitude_brief(adjust_baro_alt(plane.altitude), plane.vert_rate, DisplayUnits); },
         align: 'right',
-        header: function () { return 'Alt.' + NBSP + '(' + get_unit_label("altitude", DisplayUnits) + ')';},
+//chg-s Change Layout by oki098972
+        //header: function () { return 'Alt.' + NBSP + '(' + get_unit_label("altitude", DisplayUnits) + ')';},
+        header: function () { return 'Alt.' + '<BR>' + '(' + get_unit_label("altitude", DisplayUnits) + ')';},
+//chg-e Change Layout by oki098972
     };
     cols.speed = {
         text: pTracks ? 'Max. Speed' : 'Speed',
         sort: function () { sortBy('speed', compareNumeric, function(x) { return x.speed; }); },
         value: function(plane) { return format_speed_brief(plane.speed, DisplayUnits); },
         align: 'right',
-        header: function () { return (pTracks ? 'Max. ' : '') + 'Spd.' + NBSP + '(' + get_unit_label("speed", DisplayUnits) + ')';},
+//chg-s Change Layout by oki098972
+        //header: function () { return (pTracks ? 'Max. ' : '') + 'Spd.' + NBSP + '(' + get_unit_label("speed", DisplayUnits) + ')';},
+        header: function () { return (pTracks ? 'M. ' : '') + 'Spd.' + '<BR>' + '(' + get_unit_label("speed", DisplayUnits) + ')';},
+//chg-e Change Layout by oki098972
     };
     cols.vert_rate = {
         text: 'Vertical Rate',
@@ -3783,7 +3847,10 @@ function refreshFeatures() {
         sort: function () { sortBy('sitedist',compareNumeric, function(x) { return x.sitedist; }); },
         value: function(plane) { return format_distance_brief(plane.sitedist, DisplayUnits); },
         align: 'right',
-        header: function () { return (pTracks ? 'Max. ' : '') + 'Dist.' + NBSP + '(' + get_unit_label("distance", DisplayUnits) + ')';},
+//chg-s Change Layout by oki098972
+        //header: function () { return (pTracks ? 'Max. ' : '') + 'Dist.' + NBSP + '(' + get_unit_label("distance", DisplayUnits) + ')';},
+        header: function () { return (pTracks ? 'M. ' : '') + 'Dist.' + '<BR>' + '(' + get_unit_label("distance", DisplayUnits) + ')';},
+//chg-e Change Layout by oki098972
     };
     cols.track = {
         text: 'Track',
@@ -3791,19 +3858,63 @@ function refreshFeatures() {
         value: function(plane) { return format_track_brief(plane.track); },
         align: 'right' };
     cols.msgs = {
-        text: 'Messages',
+//chg-s Change Layout by oki098972
+        //text: 'Messages',
+        text: 'Msgs',
+//chg-e Change Layout by oki098972
         sort: function () { sortBy('msgs', compareNumeric, function(x) { return x.messages; }); },
         value: function(plane) { return plane.messages; },
         align: 'right' };
     cols.seen = {
         text: 'Seen',
         sort: function () { sortBy('seen', compareNumeric, function(x) { return x.seen; }); },
-        value: function(plane) { return plane.seen.toFixed(0); },
+//chg-s Change Layout by oki098972
+//        value: function(plane) { return plane.seen.toFixed(0); },
+        value: function(plane) { return Number(plane.seen.toFixed(0)) + Math.round(pTracksEnd ? pTracksEnd * 3600 : 0); },
+//chg-e Change Layout by oki098972
         align: 'right' };
     cols.rssi = {
-        text: 'RSSI',
+//chg-s First catch time by oki098972
+        //text: 'RSSI',
+        text: 'RSSI' + ' / First',
+        header: function () { return 'RSSI'+ '<BR>' + '/First';},
+//chg-e First catch time by oki098972
         sort: function () { sortBy('rssi', compareNumeric, function(x) { return x.rssi; }); },
-        value: function(plane) { return (plane.rssi != null ? plane.rssi.toFixed(1) : ""); },
+//chg-s First catch time by oki098972
+        //value: function(plane) { return (plane.rssi != null ? plane.rssi.toFixed(1) : ""); },
+        value: function(plane) {
+            let arrayForLog = [];
+            let lowest_val = 99999999999999999999999, lowest_ind, i;
+            //for logging 表示桁を減らすために使用、桁が多いと目視確認で死ぬので const c_v = 1695700000;
+            arrayForLog[0] = plane.altitudeTime;
+            arrayForLog[1] = plane.flightTs;
+            arrayForLog[2] = plane.last_info_server;
+            arrayForLog[3] = plane.last_message_time;
+            arrayForLog[4] = plane.refreshTR;
+            arrayForLog[5] = plane.refreshTR;
+            if (pTracks) {
+                if (typeof plane.track_linesegs[0] !== "undefined") {
+				    //位置情報がない場合本プロパティはない為、存在確認してから参照する
+				    //[0]が最初かは不明だが普通時系列で並んでいるでしょう
+				    //値があるときはここの時間が他の配列要素より最古であることは確認済み
+				    //値がない場合は大体[3]が多いが[1]の時もあるので結局最小値を探すことにした
+                    arrayForLog[5] = plane.track_linesegs[0].ts;
+                }
+            }
+            for ( i = 0; i < arrayForLog.length; i++) {
+			    if (arrayForLog[i] == 0) {
+				    continue; //たまに他の要素に時間があるのに0の時があるので除外、[0]が多かったかな？
+				}
+			    if ( lowest_val > arrayForLog[i] )
+			    {
+				    lowest_val = arrayForLog[i];
+				    lowest_ind = i;
+				}
+			}
+            // for logging console.log(plane.icao, ": ", (lowest_ind != 5 ? "*" : ""), lowest_ind, (lowest_ind != 5 ? "*" : ""), ": ", Math.floor(arrayForLog[0] - c_v), " ", Math.floor(arrayForLog[1] - c_v), " ", Math.floor(arrayForLog[2] - c_v), " ", Math.floor(arrayForLog[3] - c_v), " ", Math.floor(arrayForLog[4] - c_v), " ", Math.floor(arrayForLog[5] - c_v), " ");
+            return ( pTracks ? (ConvUnixMSecToHourMinStr(lowest_val*1000)) : (plane.rssi != null ? plane.rssi.toFixed(1) : "") );
+        },
+//chg-e First catch time by oki098972
         align: 'right' };
     cols.lat = {
         text: 'Latitude',
@@ -3816,9 +3927,22 @@ function refreshFeatures() {
         value: function(plane) { return (plane.position != null ? plane.position[0].toFixed(4) : ""); },
         align: 'right' };
     cols.data_source = {
-        text: 'Source',
+//chg-s Last catch time by oki098972
+        //text: 'Source',
+        text: 'Src'+ ' / Last',
+        header: function () { return 'Src'+ '<BR>' + '/Last';},
+//chg-e Last catch time by oki098972
         sort: function () { sortBy('data_source', compareNumeric, function(x) { return x.getDataSourceNumber(); } ); },
-        value: function(plane) { return format_data_source(plane.getDataSource()); },
+//chg-s Last catch time by oki098972
+        //value: function(plane) { return format_data_source(plane.getDataSource()); },
+        value: function(plane) {
+            if (pTracks) {
+                return ConvUnixMSecToHourMinStr(pTracksCurrentTime - (Number(plane.seen.toFixed(0)) + (pTracksEnd ? pTracksEnd * 3600 : 0)) * 1000);
+            } else {
+                return format_data_source(plane.getDataSource());
+            }
+        },
+//chg-e Last catch time by oki098972
         align: 'right' };
     cols.military = {
         text: 'Mil.',
@@ -4065,6 +4189,22 @@ function refreshFeatures() {
 
         ctime && console.timeEnd("planeMan.refresh()");
         atime && console.timeEnd("planeMan.refresh()");
+//ins-s add pTracks start param by oki098972
+        let loc_str = "";
+        let loc_time = false;
+        if (pTracks) {
+            loc_time = pTracksCurrentTime - pTracks * 3600 * 1000;
+            loc_str = new Date(loc_time).toLocaleString("ja");
+            if (pTracksEnd) {
+                loc_time = pTracksCurrentTime - pTracksEnd * 3600 * 1000;
+            } else {
+                loc_time = pTracksCurrentTime;
+            }
+            loc_str += "～";
+            loc_str += new Date(loc_time).toLocaleTimeString("ja");
+        }
+        document.getElementById("add_sp_time").innerHTML = loc_str;
+//ins-e add pTracks start param by oki098972
     }
 
     //
@@ -4558,7 +4698,10 @@ function adjustInfoBlock() {
 
     if (showPictures) {
         if (planespottersAPI || planespottingAPI) {
-            jQuery('#photo_container').css('height', photoWidth * 0.883 + 'px');
+//chg-s Change Layout by oki098972
+            //jQuery('#photo_container').css('height', photoWidth * 0.883 + 'px');
+            jQuery('#photo_container').css('height', photoWidth * 0.700 + 'px');
+//chg-e Change Layout by oki098972
         } else {
             jQuery('#photo_container').css('height', '40px');
         }
@@ -4566,7 +4709,7 @@ function adjustInfoBlock() {
 }
 
 function initializeUnitsSelector() {
-    // Get display unit preferences from local storage otherwise use value previously set defaults.js or config.js
+    // Get display unit preferences from local storage otherwise use value previously set defaults_2514768559b893179a20af7e17dec141.js or config.js
     if (loStore.getItem('displayUnits')) {
         DisplayUnits = loStore['displayUnits'];
     }
@@ -5407,7 +5550,18 @@ function setGlobalScale(scale, init) {
     globalScale = scale;
     document.documentElement.style.setProperty("--SCALE", globalScale);
 
-    labelFont = "bold " + (12 * globalScale * labelScale) + "px/" + (14 * globalScale * labelScale) + "px Tahoma, Verdana, Helvetica, sans-serif";
+//chg-s 航跡に出す文字を小さくする by oki098972
+    //labelFont = "bold " + (12 * globalScale * labelScale) + "px/" + (14 * globalScale * labelScale) + "px Tahoma, Verdana, Helvetica, sans-serif";
+    //labelFont = "bold " + (10 * globalScale * labelScale) + "px/" + (11 * globalScale * labelScale) + "px Tahoma, Verdana, Helvetica, sans-serif";
+    //labelFont = "bold " + (9 * globalScale * labelScale) + "px/" + (10 * globalScale * labelScale) + "px Tahoma, Verdana, Helvetica, sans-serif";
+    //use before 2023/09/15 labelFont = "normal " + (9 * globalScale * labelScale) + "px/" + (10 * globalScale * labelScale) + "px Tahoma, Verdana, Helvetica, sans-serif";
+    labelFont = "normal " + (10.5 * globalScale * labelScale) + "px/" + (9.75 * globalScale * labelScale) + "px Arial";
+//chg-e 航跡に出す文字を小さくする by oki098972
+//chg-s ラベルに出す文字を小さくする by oki098972
+    //labelFont2 = "bold " + (13 * globalScale * labelScale) + "px/" + (14 * globalScale * labelScale) + "px Tahoma, Verdana, Helvetica, sans-serif";
+    //labelFont2 = "normal " + (11 * globalScale * labelScale) + "px/" + (11.5 * globalScale * labelScale) + "px Tahoma, Verdana, Helvetica, sans-serif";
+    labelFont2 = "normal " + (12 * globalScale * labelScale) + "px/" + (13 * globalScale * labelScale) + "px Tahoma, Verdana, Helvetica, sans-serif";
+//chg-e ラベルに出す文字を小さくする by oki098972
 
     checkScale();
     setLineWidth();
@@ -6536,7 +6690,14 @@ function setLineWidth() {
     labelFill = new ol.style.Fill({color: 'white' });
     blackFill = new ol.style.Fill({color: 'black' });
     labelStroke = new ol.style.Stroke({color: 'rgba(0,0,0,0.7', width: 4 * globalScale});
-    labelStrokeNarrow = new ol.style.Stroke({color: 'rgba(0,0,0,0.7', width: 2.5 * globalScale});
+//chg-s 航跡に出す文字を小さくする by oki098972
+    //labelStrokeNarrow = new ol.style.Stroke({color: 'rgba(0,0,0,0.7', width: 2.5 * globalScale});
+    labelStrokeNarrow = new ol.style.Stroke({color: 'rgba(0,0,0,1', width: 4 * globalScale});
+//chg-e 航跡に出す文字を小さくする by oki098972
+//ins-s ラベルに出す文字を小さくする by oki098972
+    labelStrokeNarrow2 = new ol.style.Stroke({color: 'rgba(0,0,0,1', width: 2.5 * globalScale});
+//ins-e ラベルに出す文字を小さくする by oki098972
+
     bgFill = new ol.style.Stroke({color: 'rgba(0,0,0,0.25'});
 }
 let lastCallLocationChange = 0;
@@ -6731,6 +6892,9 @@ function remakeTrails() {
 
 function createLocationDot() {
     locationDotFeatures.clear();
+//ins-s don't show site position by oki098972
+    return;
+//ins-e don't show site position by oki098972
     let markerStyle = new ol.style.Style({
         image: new ol.style.Circle({
             radius: 7,
@@ -6750,6 +6914,9 @@ function drawSiteCircle() {
     //console.trace();
     siteCircleFeatures.clear();
 
+//ins-s don't show site position by oki098972
+    return;
+//ins-e don't show site position by oki098972
     if (!SitePosition)
         return;
 
@@ -8776,7 +8943,487 @@ function globeRateUpdate() {
 }
 globeRateUpdate();
 
+//ins-s First catch time by oki098972
+//1970/1/1 0:00からの経過ミリ秒数をhh:mm形式の文字列で返す関数
+function ConvUnixMSecToHourMinStr(unix_msec) {
+    let loc_datetime = new Date(unix_msec);
+    //return loc_datetime.getHours() + ':' + loc_datetime.getMinutes();
+    //return ('0' + loc_datetime.getHours()).slice(-2) + ':' + ('0' + loc_datetime.getMinutes()).slice(-2);
+    return loc_datetime.getHours() + ':' + ('0' + loc_datetime.getMinutes()).slice(-2);
+}
+//ins-e First catch time by oki098972
 
+
+//ins-s add 通報簡略化 param by oki098972
+function datetimestr(datedata) {
+    let toString = Object.prototype.toString;
+    let temp_str = "";
+    let flg = toString.call(datedata).slice(8, -1);
+    if(flg === 'Date'){
+        temp_str = (datedata.getMonth() + 1) + "/" + datedata.getDate() + " " + datedata.getHours().toString().padStart(2, '0') + ":" + datedata.getMinutes().toString().padStart(2, '0') + ":" + datedata.getSeconds().toString().padStart(2, '0');
+    }
+    return temp_str;
+}
+
+//ブラウザが用意しているconfirmダイアログは位置が変なところに出るので使いたくないのでカスタム版を使う
+//ネタ元：https://qiita.com/naoki-funawatari/items/4de792bfefe5eab909cc
+//confirm互換の為、同期間数として動作する、
+//ただし完全互換は無理らしく（そこまでこだわっていもいないし）呼ぶ側の処理（関数）をasyncで宣言する必要がある
+//例 async function Write_tweetstr() 関数内で await confirmAsync() で処理を呼ぶ
+const confirmAsync = async message => {
+    let i = 0;
+
+    document.getElementById("bs_message").innerHTML = message;
+    document.getElementById("bs_dialog").showModal();
+
+    //時間の選択肢を表示する処理
+    let c_t = new Date();
+    let tgt_time = Array(16);
+    let msectbl = [];
+    if ((c_t.getHours() == 7 && c_t.getMinute() >= 34) || (c_t.getHours() >= 8 && c_t.getHours() <= 21)) {
+        msectbl = Array(-34680000, 480000, -52680000, 480000, -34680000, 480000, -52680000, 480000, -34680000, 480000, -52680000, 480000, -34680000, 480000, -52680000);
+        tgt_time[0] = new Date(c_t.getFullYear(), c_t.getMonth(), c_t.getDate(), 7, 34);
+    } else {
+        msectbl = Array(-52680000, 480000, -34680000, 480000, -52680000, 480000, -34680000, 480000, -52680000, 480000, -34680000, 480000, -52680000, 480000, -34680000);
+        if (c_t.getHours() >= 22) {
+            tgt_time[0] = new Date(c_t.getFullYear(), c_t.getMonth(), c_t.getDate(), 22, 4);
+        } else {
+            tgt_time[0] = new Date(c_t.getFullYear(), c_t.getMonth(), c_t.getDate() - 1, 22, 4);
+        }
+    }
+    for (i = 0; i < tgt_time.length - 1; i++) {
+        tgt_time[i + 1] = new Date(tgt_time[i].valueOf() + msectbl[i]);
+    }
+    for(i = 0; i < (tgt_time.length/2); i++) {
+        document.getElementById("lbid_timerg_" + String(i + 1)).innerText = datetimestr(tgt_time[i*2 + 1]) + " ～ " + datetimestr(tgt_time[i*2]);
+    }
+
+    return new Promise(resolve => {
+        let nexturl = "";
+        let param_ptracks = 0;
+        let param_ptracksend = 0;
+        const eventBase = flag => () => {
+            document.getElementById("bs_dialog").close();
+            document.getElementById("bs_button-ok").removeEventListener("click", okEvent);
+            document.getElementById("bs_button-cancel").removeEventListener("click", cancelEvent);
+            document.getElementById("bs_button-changeurl").removeEventListener("click", chgurlEvent);
+            if (flag == "changeurl") {
+                //chgurlEventを受けて処理を書くのが一般的な気もするがまあいいか他の処理考えるのめんどくさいし
+                //url入力欄にurl突っ込んでリロードする処理
+                const  timerg_val = document.forms.popupForm.timerange.value;
+                if (timerg_val >= 0 && timerg_val <= 8) {  //要改良
+                    let c_t2 = new Date();
+                    param_ptracks = c_t2.valueOf() - tgt_time[timerg_val*2 + 1].valueOf();
+                    param_ptracksend = c_t2.valueOf() - tgt_time[timerg_val*2].valueOf();
+                    param_ptracks = Math.round(param_ptracks / 1000 / 60 / 60 * 1000) / 1000; //ミリ秒を時間に変換(1000を掛けて割ってるのは有効桁の為)
+                    param_ptracksend = Math.round(param_ptracksend / 1000 / 60 / 60 * 1000) / 1000; //ミリ秒を時間に変換(1000を掛けて割ってるのは有効桁の為)
+                    nexturl = location.origin + location.pathname;
+                    if (nexturl.indexOf(".")) {
+                        nexturl = nexturl.substr(0, nexturl.lastIndexOf("/"));
+                    }
+                    if (nexturl[nexturl.length -1] != "/" ) {
+                        nexturl = nexturl + "/";
+                    }
+                    nexturl = nexturl + "?pTracks=" + param_ptracks + "&pTracksEnd=" + param_ptracksend;
+                } else {
+                }
+            }
+            resolve(flag);
+            if (nexturl != "") {
+                //url文字列が設定されていればurl入力欄に張り付けてリロード
+                if (param_ptracks != 0 && param_ptracks > TraceHour) {
+                    TraceHour = Math.ceil(param_ptracks);
+                    localStorage.setItem('TraceHour', TraceHour);
+                }
+                window.location.href = nexturl;
+            }
+        };
+        const okEvent = eventBase("ok");
+        const cancelEvent = eventBase("cancel");
+        const chgurlEvent = eventBase("changeurl");
+    
+        document.getElementById("bs_button-ok").addEventListener("click", okEvent);
+        document.getElementById("bs_button-cancel").addEventListener("click", cancelEvent);
+        document.getElementById("bs_button-changeurl").addEventListener("click", chgurlEvent);
+    });
+};
+
+//クリップボードにテキストをコピーする処理
+//こんな面倒とは思わなんだ
+//https://qiita.com/NOMURA_keibyou38/items/5dc2ea9419ea45a482da
+//よりcopyTextFallback, copyTemplate関数を一部改変
+
+// http環境で動くコピーコード
+function copyTextFallback (str) {
+    if (!str || typeof str !== 'string') {
+        return '';
+    }
+    const textarea = document.createElement('textarea');
+    textarea.id = 'tmp_copy';
+    textarea.style.position = 'fixed';
+    textarea.style.right = '100vw';
+    textarea.style.fontSize = '16px';
+    //元はこのコードだったが、このままだと呼ぶ場所を移動するとクリップボードにペーストできない
+    //不具合があった為、textarea.readOnly = true;に変更するとなぜか改善した
+    //textarea.setAttribute('readonly', 'readonly');
+    textarea.readOnly = true;
+    textarea.textContent = str;
+    document.body.appendChild(textarea);
+    const elm = document.getElementById('tmp_copy');
+    elm.select();
+    const range = document.createRange();
+    range.selectNodeContents(elm);
+    const sel = window.getSelection();
+    if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+    elm.setSelectionRange(0, 999999);
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    return str;
+}
+
+// メインのコピーコード
+function copyTemplate(copyText) {
+    if (!navigator.clipboard) {
+        // navigator.clipboardが利用的出来ない場合は、フォールバックなコードを実行
+        //https環境下だとここに落ちるらしい
+        copyTextFallback(copyText);
+        //alert(`${targetText}をコピーしました。`);
+        return;
+    }
+    // https環境で動作するコード
+    navigator.clipboard.writeText(copyText).then(
+        () => {
+            //結果は非同期で返ってくる：成功時の処理
+            //alert(`${targetText}をコピーしました。`);
+        },
+        () => {
+            //結果は非同期で返ってくる：失敗時の処理
+            //alert('コピーに失敗しました。');
+        }
+    );
+}
+
+//渡された位置が、嘉手納の設定緯度経度範囲内、設定高度以下の場合
+//嘉手納基地から離着陸した可能性があるのでtrueを返す
+function kd_reg_check(seg_point) {
+    let ret_val = false;
+    if (seg_point.altitude <= 1500) { //1500ft = 457.2m
+        if ((seg_point.position[0] >= 127.7176) && (seg_point.position[0] <= 127.8176)) {
+            if ((seg_point.position[1] >= 26.3054) && (seg_point.position[1] <= 26.4054)) {
+                ret_val = true;
+            }
+        }
+    }
+    return ret_val;
+}
+//渡された位置が、普天間の設定緯度経度範囲内、設定高度以下の場合
+//普天間基地から離着陸した可能性があるのでtrueを返す
+function ft_reg_check(seg_point) {
+    let ret_val = false;
+    if (seg_point.altitude <= 1500) { //1500ft = 457.2m
+        if ((seg_point.position[0] >= 127.7063) && (seg_point.position[0] <= 127.8063)) {
+            if ((seg_point.position[1] >= 26.2242) && (seg_point.position[1] <= 26.3242)) {
+                ret_val = true;
+            }
+        }
+    }
+    return ret_val;
+}
+
+
+//モーダルウィンドウ（ポップアップ）に引数の文字列を表示する
+//表示されたポップアップはポップアップの外（でもブラウザ上？）をクリックしたら消える
+function show_and_close_ModalWindow(strArgument) {
+    //モーダルを生成する→新しいタグを生成
+    const modalElement = document.createElement('div');
+    // 作ったdivの中にcss→modalを付与する
+    modalElement.classList.add('modalBo');
+    //モーダルウィンドウの中身を作る
+    //新しいdivタグを生成する
+    const innerElement = document.createElement('div');
+    //作ったdivの中にcss→innerを付与する
+    innerElement.classList.add('innerBo');
+    //表示したい文章をセット
+    innerElement.innerHTML = strArgument;
+    //モーダルの中身に要素を配置する
+    modalElement.appendChild(innerElement);
+    //body要素にモーダルを配置する
+    document.body.appendChild(modalElement);
+    //中身をクリックしたらモーダルウインドウを削除する
+    //innerElement.addEventListener('click',() => {
+    //  closeModalWindow(modalElement);
+    //});
+    //モーダルの外をクリックしたらモーダルウインドウを削除する
+    innerElement.parentNode.addEventListener('click', (event) => {
+        if (!innerElement.contains(event.target)) {
+            closeModalWindow(modalElement);
+        }
+    });
+    //モーダルウインドウを閉じる
+    function closeModalWindow(modalElement){
+      　　document.body.removeChild(modalElement);
+    }
+}
+
+//嘉手納、普天間発着機の可能性が高い航空機のリストを作り、対象の航空機を選択状態にする
+//作成したリストはポップアップ及びクリップボードに張り付ける
+function ListUpPlaneFromToMilAirport() {
+    let strTemp = "";
+    let mil_icao = [];
+    let i = 0;
+    let j = 0;
+    //嘉手納/普天間発着機のリストを作る
+    for (i = 0; i < g.planesOrdered.length; ++i) {
+        let target_flg = false;
+        const plane = g.planesOrdered[i];
+        if (plane.military == true || plane.visible == false || ( (("typeDescription" in plane) && plane.typeDescription !== null ) && plane.typeDescription.charAt(0) == 'H')) {
+            continue; //ヘリと軍用機と表にない人は対象外
+        }
+        for (j = plane.track_linesegs.length-1; j >= 0; j--) {
+            if (kd_reg_check(plane.track_linesegs[j])) {
+                target_flg = true;
+                break;
+            }
+            if (ft_reg_check(plane.track_linesegs[j])) {
+                target_flg = true;
+                break;
+            }
+        }
+        if (target_flg == true) {
+            mil_icao.push(plane.icao);
+        }
+    }
+    if (mil_icao.length > 0) {
+        strTemp = strTemp + "<br>";
+        if ( !multiSelect ) {
+            toggleMultiSelect( "on" );
+        }
+        for (i = 0; i < mil_icao.length; ++i) {
+            strTemp = strTemp + "<br>" + mil_icao[i];
+            let plane_temp = g.planes[mil_icao[i]];
+            if ("selected" in plane_temp) {
+                if (plane_temp.selected != true) {
+                    selectPlaneByHex(mil_icao[i], {follow: false});
+                }
+            } else {
+                selectPlaneByHex(mil_icao[i], {follow: false});
+            }
+        }
+    }
+    strTemp = strTemp + "<br>";
+    copyTemplate(strTemp.replace(/<br>/g, "\n"));
+    //モーダルウィンドウ（ポップアップ）に表示
+    show_and_close_ModalWindow(strTemp);
+}
+
+//twitter投稿用文字列を作成し、ダイアログとクリップボードに張り付ける
+//選択した航空機がある場合、時刻（ボタンをクリックした時間）の後に一番最初に選択した航空機から音の種類を類推して文字列に加える
+//選択した航空機がない場合、時刻の後には不明と文字列に加える
+//軍用機、複数選択した航空機が存在する場合、時間の行とタグの行の間に航空機のHexと（判明すれば）機種を加える
+async function Write_tweetstr() {
+    let strSound = "";
+    let model_name = "";
+    let type_str = "";
+    let pdata = [];
+    let mil_icao = [];
+    let mil_model = [];
+    let i = 0;
+    let today = new Date();
+    // 文字列としてURLを取得する。
+    let url_string = window.location.href;
+    // 文字列としてのURLをURLオブジェクトに変換する。
+    let url = new URL(url_string);
+    // URLオブジェクトのsearchParamsのget関数でIDがdの値を取得する。定義されていなければnullが返る
+    let icaohex = url.searchParams.get("icao");
+    //icaohex = icaohex.toUpperCase();
+    if ( icaohex != null) {
+        icaohex = icaohex.split(",");
+        for (i = 0; i < g.planesOrdered.length; ++i) {
+            const plane = g.planesOrdered[i];
+            if (plane.icao == icaohex[0]) {
+                pdata.push(plane.registration);
+                pdata.push(plane.icaoType);
+                pdata.push("not support");  //for compatibility, not used
+                pdata.push(plane.typeLong);
+                pdata.push(plane.typeDescription);
+                break;
+            }
+        }
+        if (pdata.length == 0){
+            icaohex[0] = "不明";
+        } else {
+            model_name = get_aircraftmodelstr(pdata[3]);
+            type_str = pdata[4];
+            if ((type_str.charAt(0) == 'L') || (type_str.charAt(0) == 'S') || (type_str.charAt(0) == 'A')
+              || (type_str.charAt(0) == 'T') || (type_str.charAt(0) == 'R')) {  //なんでかAE4E53、V-22がR2Tで登録されている、Rは一文字目に無い筈なんだが
+                if (type_str.charAt(2) == 'J'){
+                    strSound = "ジェット音、";
+                } else if ((type_str.charAt(2) == 'T') || (type_str.charAt(2) == 'P')) {
+                    strSound = "プロペラ音、";
+                }
+            } else if (type_str.charAt(0) == 'H'){
+                strSound = "ヘリの音、";
+            }
+        }
+        pdata.length = 0;
+    } else {
+        icaohex = [];
+        icaohex[0] = "不明";
+    }
+    //軍用機のリストを作る
+    for (i = 0; i < g.planesOrdered.length; ++i) {
+        const plane = g.planesOrdered[i];
+        if (((plane.military && plane.visible) || plane.selected) && (plane.icao != icaohex[0]) ) {
+            //visibleは表に在る、inViewはなんだろ？visibleがfalseでもinViewがtureがあるんだよ
+            mil_icao.push(plane.icao.toUpperCase());
+            mil_model.push(get_aircraftmodelstr(plane.typeLong));
+        }
+    }
+    let strTemp = TownName;
+    strTemp = strTemp + " " + String(today.getMonth()+1) + "/" +  String(today.getDate()) + "<br><br>";
+    strTemp = strTemp + today.getHours().toString().padStart(2, '0') + ":" + today.getMinutes().toString().padStart(2, '0') + " ";
+    if ((icaohex[0] == "不明") && (strSound.length == 0)) {
+        strTemp = strTemp + icaohex[0].toUpperCase();
+    } else {
+        strTemp = strTemp + strSound + icaohex[0].toUpperCase() + "、" + model_name;
+    }
+    if (mil_icao.length > 0) {
+        strTemp = strTemp + "<br>";
+        for (i = 0; i < mil_icao.length; ++i) {
+            strTemp = strTemp + "<br>" + mil_icao[i] + "、" + mil_model[i];
+        }
+    }
+    strTemp = strTemp + "<br><br>#OHアラート";
+    copyTemplate(strTemp.replace(/<br>/g, "\n"));
+    //モーダルウィンドウ（ポップアップ）に表示
+    show_and_close_ModalWindow(strTemp);
+}
+
+//以下の２機能をまとめたもの
+//１．グローバル変数g.planesOrderedの中身を、内部配列に格納する
+//　　配列の先頭行はg.planesOrderedの連想配列のキー名（一番キーの数が多いものを探して表示している）
+//　　二行目以降はg.planesOrderedの配列の先頭からキー値を格納、ないものは空欄だっけ？
+//　　（各配列(g.planesOrdered[]の事)のキーの数がバラバラなのでいったん配列に格納することで比較しやすくした
+//２．三択ダイアログで以下の動作を行う
+//　　OK：表に表示されている航空機をすべて選択状態にする。（Uボタン押下、Filteringなどで表に出る航空機を減らして使うことを想定）
+//　　　　１．で作成した内部配列をcsv形式でダイアログとクリップボードに書き出す
+//　　Cansel：１．で作成した内部配列をcsv形式でダイアログとクリップボードに書き出す（航空機を選択状態にしないのがOKとの差分）
+//　　Chg URL：４つの選択肢に示した時間帯をブラウザのURL欄に書き、それを表示させる
+async function SelectTablesPlane_or_DispPlaneTimeslot() {
+    let strTemp = "n,visible,inView,";
+    let i = 0;
+    let j = 0;
+    Object.keys(g.planesOrdered[0]).forEach(key => { strTemp = strTemp + key + ","; }); // キーのみ出力
+    strTemp = strTemp + "<br>";
+    //グローバルにある航空機のリストを作る
+    let key_count = 0;
+    let pointer = 0;
+    for (i = 0; i < g.planesOrdered.length; ++i) { //まず一番メンバが多い人を探す
+        if (Object.keys(g.planesOrdered[i]).length > key_count) {
+            key_count = Object.keys(g.planesOrdered[i]).length;
+            pointer = i;
+        }
+    }
+    //g.planesOrderedの各値を格納する配列の宣言
+    //適当な例が見つからなかったもので
+    let a_keyname = new Array(g.planesOrdered.length + 1);
+    a_keyname[0] = new Array(key_count);
+    for (i = 0; i < g.planesOrdered.length; ++i) {
+        a_keyname[i+1] = new Array(key_count);
+    }
+    i = 0;
+    Object.keys(g.planesOrdered[pointer]).forEach(key => {
+        strTemp = strTemp + key + ",";
+        a_keyname[0][i] = key; //連想配列のキーの名前を配列の0行目に突っ込む
+        i++;
+    });
+    for (i = 0; i < g.planesOrdered.length; ++i) {
+        let count = 0;
+        let strline = "";
+        let value;
+        let planedata = g.planesOrdered[i];
+        for (j = 0; j < key_count; j++) { 
+            if (a_keyname[0][j] in planedata) {
+                value = planedata[a_keyname[0][j]];
+            } else {
+                value ="";
+            }
+            let str = "";
+            if (typeof(value) == "object") {
+                if (Array.isArray(value)) {
+                    str = "#o";
+                } else {
+                    str = String(value);
+                }
+            } else if (typeof(value) == "function") {
+                str = "#f";
+            } else if (Array.isArray(value)) {
+                str = "#a";
+            } else {
+                str = String(value);
+            }
+            if (str.indexOf("\n") > -1) str = "aaa";
+            if (str.indexOf("[") > -1) str = "#o";
+            if (str.indexOf(",") > -1) str = "#a";
+            if (str == "unknown") str = "#uk";
+            if (str == "undefined") str = "#ud";
+            strline = strline + str + ",";
+            if ( (typeof(str) != "string") || (str.length == 0) ) {
+                str = "a";
+            }
+            a_keyname[i+1][j] = str;
+            count++;
+        };// 値のみ出力
+    }
+    for (i = 0; i < g.planesOrdered.length + 1; ++i) {
+        for (j = 0; j < key_count; j++) {
+            strTemp = strTemp + a_keyname[i][j] + ",";
+        }
+        strTemp = strTemp + "<br>";
+    }
+    strTemp = strTemp + "<br><br><br>";
+    let htmlTable = document.getElementById('planesTable');
+    for( i = 0; i < htmlTable.rows.length; ++i) {
+        let cells = htmlTable.rows[ i ].cells;
+        for( j = 0; j < cells.length; j++ ) {
+            strTemp = strTemp + cells[ j ].textContent + ",";
+        }
+        strTemp = strTemp + "<br>";
+    }
+    if ( (htmlTable.rows[ 0 ].cells[ 0 ].textContent == "Hex ID") && (htmlTable.rows.length > 1) ) {
+        if (htmlTable.rows.length > 1) {
+            let str_arg = "グローバル変数g.planesOrdered連想配列の内容、および画面右の表を<br>クリップボードにコピーしました。<br><br>続いて現在表に記載されている<br>　「 "
+                          + String(htmlTable.rows.length - 1) + " 」機 を選択状態にしますか？"
+            if (await confirmAsync(str_arg)  == "ok") {
+                for( i = 1; i < htmlTable.rows.length; ++i) {
+                    if ( !multiSelect ) {
+                        toggleMultiSelect( "on" );
+                    }
+                    let hex_str = htmlTable.rows[ i ].cells[ 0 ].textContent;
+                    let plane_temp = g.planes[hex_str];
+                    if ("selected" in plane_temp) {
+                        if (plane_temp.selected != true) {
+                            selectPlaneByHex(hex_str, {follow: false});
+                        }
+                    } else {
+                        selectPlaneByHex(hex_str, {follow: false});
+                    }
+                }
+            } else {
+                //alert("キャンセルが押されました。");
+            }
+        }
+    }
+    //クリップボードに調査用データをコピー
+    let strClipBoard = strTemp;
+    copyTemplate(strClipBoard.replace(/<br>/g, "\n"));
+    //モーダルウィンドウ（ポップアップ）に表示
+    show_and_close_ModalWindow(strTemp);
+}
+//ins-e add 通報簡略化 param by oki098972
 
 parseURLIcaos();
 initialize();

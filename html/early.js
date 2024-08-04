@@ -49,6 +49,16 @@ let replay = false;
 let rData = [];
 let StaleReceiverCount = 0;
 let pTracks = false;
+//ins-s add pTracks start param by oki098972
+let pTracksEnd = false;
+let pTracksCurrentTime = false;
+//ins-e add pTracks start param by oki098972
+//ins-s add TraceHour param by oki098972
+let TraceHour = false;
+//ins-e add TraceHour param by oki098972
+//ins-s add 通報簡略化 param by oki098972
+let TownName = "未設定";
+//ins-e add 通報簡略化 param by oki098972
 let pTracksInterval = 15;
 let lastTraceGet = 0;
 let traceRate = 0;
@@ -197,6 +207,80 @@ if (usp.has('showerrors') || usp.has('jse')) {
     }
 }
 
+//ins-s add TraceHour param by oki098972
+function setTraceHourparam() {
+    if(typeof localStorage === 'undefined') {
+        TraceHour = 16;
+    } else {
+        let tmp = jQuery("#tracehour_input").val().trim();
+        if ( (tmp !== null) && isFinite(tmp) ) {
+            TraceHour = Number(tmp);
+            localStorage.setItem('TraceHour', TraceHour);
+        } else {
+            TraceHour = 16;
+        }
+    }
+    return;
+}
+
+function getTraceHourparam() {
+    if(typeof localStorage === 'undefined') {
+        TraceHour = 16;
+    } else {
+		let tmp = localStorage.getItem('TraceHour');
+        if ( (tmp !== null) && isFinite(tmp) ) {
+            TraceHour = Number(tmp);
+        } else {
+            TraceHour = 16;
+        }
+    }
+    jQuery("#tracehour_input").val(TraceHour);
+    return;
+}
+
+function resetTraceHourparam() {
+    if(typeof localStorage === 'undefined') {
+        TraceHour = 16;
+    } else {
+        TraceHour = Number(16);
+        jQuery("#tracehour_input").val(TraceHour);
+        localStorage.setItem('TraceHour', TraceHour);
+    }
+    return;
+}
+//ins-e add TraceHour param by oki098972
+
+//ins-s add 通報簡略化 param by oki098972
+function setTownname() {
+    if(typeof localStorage === 'undefined') {
+        TownName = "未設定";
+    } else {
+        let tmp = jQuery("#townname_input").val().trim();
+        if ( (tmp !== null) && (tmp.length > 0) ) {
+            TownName = tmp;
+            localStorage.setItem('TownName', TownName);
+        } else {
+            TownName = "未設定";
+        }
+    }
+    return;
+}
+function getTownname() {
+    if(typeof localStorage === 'undefined') {
+        TownName = "未設定";
+    } else {
+		let tmp = localStorage.getItem('TownName');
+        if ( (tmp !== null) && (tmp.length > 0) ) {
+            TownName = tmp;
+        } else {
+            TownName = "未設定";
+        }
+    }
+    jQuery("#townname_input").val(TownName);
+    return;
+}
+//ins-e add 通報簡略化 param by oki098972
+
 function resetSettings() {
     loStore.clear();
     if (window.history && window.history.replaceState) {
@@ -324,7 +408,40 @@ if (usp.has('pTracks')) {
         pTracks = tmp;
     else
         pTracks = 9999;
+//ins-s add pTracks start param by oki098972
+    if (usp.has('pTracksEnd')) {
+        let tmp = parseFloat(usp.get('pTracksEnd'))
+        if (tmp > 0 && tmp < 9999)
+            pTracksEnd = tmp;
+        else
+            pTracksEnd = false;
+    }
+    pTracksCurrentTime = new Date().getTime();
+//ins-e add pTracks start param by oki098972
 }
+//ins-s add TraceHour param by oki098972
+{
+    if(typeof localStorage === 'undefined') {
+        TraceHour = 16;
+//ins-s add 通報簡略化 param by oki098972
+        TownName = "未設定";
+//ins-e add 通報簡略化 param by oki098972
+    } else {
+        let tmp = localStorage.getItem('TraceHour');
+        if ( (tmp !== null) && isFinite(tmp) )
+            TraceHour = Number(tmp);
+        else
+            TraceHour = 16;
+//ins-s add 通報簡略化 param by oki098972
+        let tmp2 = localStorage.getItem('TownName');
+        if ( (tmp2 !== null) && (tmp2.length > 0) )
+            TownName = tmp2;
+        else
+            TownName = "未設定";
+//ins-e add 通報簡略化 param by oki098972
+    }
+}
+//ins-e add TraceHour param by oki098972
 
 function getDay(date) {
     if ((utcTimesLive && !showTrace) || (utcTimesHistoric && showTrace))

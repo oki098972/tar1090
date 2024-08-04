@@ -102,13 +102,22 @@ select {
 }
 
 .sidebar_button {
+/* chg-s move button by oki098972 */
+    //width: calc( 32px * var(--SCALE));
+    //height: calc( 38px * var(--SCALE));
+    //border-radius: calc( 2px * var(--SCALE));
+    //ボタンをウィンドウ右端に飛ばしたのでリサイズ止めた;
     width: calc( 32px * var(--SCALE));
     height: calc( 38px * var(--SCALE));
     border-radius: calc( 2px * var(--SCALE));
+/* chg-e move button by oki098972 */
     background-color: rgba(255,255,255,.2);
 
     cursor: pointer;
+/* chg-s move button by oki098972 */
+    //background-size: calc( 26px * var(--SCALE)) calc( 30px * var(--SCALE));
     background-size: calc( 26px * var(--SCALE)) calc( 30px * var(--SCALE));
+/* chg-e move button by oki098972 */
     background-repeat: no-repeat;
     background-position: center;
 
@@ -173,9 +182,14 @@ select {
     top:  calc( 5px * var(--SCALE));
     left: calc( 0px * var(--SCALE));
     float: right;
-    width: calc( 30px * var(--SCALE));
-    height: calc( 30px * var(--SCALE));
-    background-size: calc( 30px * var(--SCALE)) calc( 30px * var(--SCALE));
+/* chg-s move button by oki098972 */
+    //width: calc( 30px * var(--SCALE));
+    //height: calc( 30px * var(--SCALE));
+    //background-size: calc( 30px * var(--SCALE)) calc( 30px * var(--SCALE));
+    width: calc( 34px * var(--SCALE));
+    height: calc( 34px * var(--SCALE));
+    background-size: calc( 34px * var(--SCALE)) calc( 34px * var(--SCALE));
+/* chg-e move button by oki098972 */
     background-repeat: no-repeat;
     background-color: transparent;
     border: none;
@@ -354,8 +368,14 @@ select.error, textarea.error, input.error {
 }
 
 .layer-switcher {
+/* chg-s move layer-switcher by oki098972 */
+    /* top: calc( 3px * var(--SCALE)) !important; */
+    /* right: calc( 44px * var(--SCALE)) !important; */
     top: calc( 3px * var(--SCALE)) !important;
-    right: calc( 44px * var(--SCALE)) !important;
+    /* left: 200px !important; */
+    /* right: 340px !important; */
+    left: 180px !important;
+/* chg-e move layer-switcher by oki098972 */
     z-index: 999;
 }
 .layer-switcher button {
@@ -366,8 +386,12 @@ select.error, textarea.error, input.error {
     height: calc( 30px * var(--SCALE));
 }
 .layer-switcher !.shown {
+/* chg-s move layer-switcher by oki098972 */
+    /* top: calc( 3px * var(--SCALE)) !important; */
+    /* right: calc( 44px * var(--SCALE)) !important; */
     top: calc( 3px * var(--SCALE)) !important;
-    right: calc( 44px * var(--SCALE)) !important;
+    left: 44px !important;
+/* chg-e move layer-switcher by oki098972 */
     width: calc( 32px * var(--SCALE));
     height: calc( 32px * var(--SCALE));
     z-index: 999;
@@ -398,6 +422,9 @@ select.error, textarea.error, input.error {
 }
 
 .sectionTitle {
+/* ins-s conpress text region by oki098972 */
+    margin-top: 6px;
+/* ins-e conpress text region by oki098972 */
     width: 100%;
     text-transform: uppercase;
     text-align: center;
@@ -434,18 +461,59 @@ select.error, textarea.error, input.error {
 #header_side {
     position: absolute;
     right: calc( 0px * var(--SCALE));
-    top:  calc( 0px * var(--SCALE));
+/* chg-s move map select button by oki098972 */
+    /* top:  calc( 0px * var(--SCALE)); */
+    top:  150px;
+/* chg-e move map select button by oki098972 */
     width: calc( 38px * var(--SCALE));
     z-index: 9;
 }
 #header_top {
     text-align: right;
     position: absolute;
-    right: calc( 94px * var(--SCALE));
+/* chg-s move button by oki098972 */
+    /* right: calc( 94px * var(--SCALE)); */
+    right: calc( 4px * var(--SCALE));
+/* chg-e move button by oki098972 */
     top: calc( 0px * var(--SCALE));
     height: calc( 38px * var(--SCALE));
     z-index: 9;
 }
+
+/* ins-s add clock by oki098972 */
+//#header_top_time {
+//    text-align: right;
+//    vertical-align: bottom;
+//    position: absolute;
+//    width: 300px;
+//    right: calc( 200px * var(--SCALE));
+//    top: calc( 0px * var(--SCALE));
+//    height: calc( 38px * var(--SCALE));
+//    z-index: 9;
+//}
+
+.bClockText
+{
+    font-weight: normal;
+    /* width: 140px; */
+    width: calc( 160px * var(--SCALE));
+    font-size: calc( 15px * var(--SCALE));
+    line-height:  calc( 27px * var(--SCALE));
+    text-align: center;
+    margin: calc( 5px * var(--SCALE));
+    color:#fff;
+    /* 以下は.buttonから流用 */
+    background-color: var(--ACCENT);
+    /* 上で指定 width: calc( 27px * var(--SCALE)); */
+    height: calc( 27px * var(--SCALE));
+    border-radius: calc( 2px * var(--SCALE));
+    margin: calc( 2px * var(--SCALE));
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    background-clip: padding-box;
+}
+/* ins-e add clock param by oki098972 */
 
 .svgButton {
     background-color: var(--ACCENT);
@@ -507,18 +575,32 @@ select.error, textarea.error, input.error {
  color:#fff
 }
 
+/* chg-s reduce hover dialog box size by oki098972 */
+//#highlighted_infoblock {
+//    background-color: var(--BGCOLOR1);
+//    position: absolute;
+//    left: calc( 40px * var(--SCALE));
+//    top: calc( 60px * var(--SCALE));
+//    min-width:  calc(132px * var(--SCALE));
+//    padding-right: calc( 5px * var(--SCALE));
+//    box-shadow: calc( 4px * var(--SCALE)) calc( 4px * var(--SCALE)) calc( 10px * var(--SCALE)) #444444;
+//    cursor: pointer;
+//    z-index: 9999;
+//    display: none;
+//}
 #highlighted_infoblock {
     background-color: var(--BGCOLOR1);
     position: absolute;
-    left: calc( 40px * var(--SCALE));
-    top: calc( 60px * var(--SCALE));
-    min-width:  calc(132px * var(--SCALE));
-    padding-right: calc( 5px * var(--SCALE));
-    box-shadow: calc( 4px * var(--SCALE)) calc( 4px * var(--SCALE)) calc( 10px * var(--SCALE)) #444444;
+    left: calc( 20px * var(--SCALE));
+    top: calc( 20px * var(--SCALE));
+    min-width:  80px;
+    padding-right: 1px;
+    box-shadow: 2px 2px 2px #444444;
     cursor: pointer;
     z-index: 9999;
     display: none;
 }
+/* chg-e reduce hover dialog box size by oki098972 */
 
 .highlightedTitle {
     border-bottom: calc( 1px * var(--SCALE)) solid #67b6c3;
@@ -546,6 +628,32 @@ select.error, textarea.error, input.error {
     color: var(--TXTCOLOR1);
 }
 
+/* ins-s reduce hover dialog box size by oki098972 */
+.identLarge_hv {
+    font-size: 14px;
+    line-height: 15px;
+    color: var(--TXTCOLOR1);
+    font-weight: lighter;
+}
+
+.identMedium_hv {
+    font-size: 12px;
+    line-height: 13px;
+    color: var(--TXTCOLOR1);
+    font-weight: lighter;
+}
+
+.identSmall_hv {
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--TXTCOLOR1);
+}
+
+.identSmall_hvdata {
+    font-size: 11px;
+}
+/* ins-e reduce hover dialog box size by oki098972 */
+
 .infoSectionTable {
     width: 100%;
     border-collapse: collapse;
@@ -560,13 +668,21 @@ table.infoSectionTable tr td {
 }
 
 .rSpacer {
-    padding-top: calc( 3px * var(--SCALE));
-    padding-bottom: calc( 3px * var(--SCALE));
+/* chg-s conpress text region by oki098972 */
+    //padding-top: calc( 3px * var(--SCALE));
+    //padding-bottom: calc( 3px * var(--SCALE));
+    padding-top: calc( 0px * var(--SCALE));
+    padding-bottom: calc( 0px * var(--SCALE));
+/* chg-e conpress text region by oki098972 */
 }
 
 .infoHeading {
-    margin-top: calc( 2px * var(--SCALE));
-    margin-bottom: calc( 2px * var(--SCALE));
+/* chg-s conpress text region by oki098972 */
+    //margin-top: calc( 2px * var(--SCALE));
+    //margin-bottom: calc( 2px * var(--SCALE));
+    margin-top: calc( 0px * var(--SCALE));
+    margin-bottom: calc( 0px * var(--SCALE));
+/* chg-e conpress text region by oki098972 */
     display: inline-block;
 }
 
@@ -575,18 +691,30 @@ table.infoSectionTable tr td {
 }
 
 .infoData {
-    margin-top: calc( 2px * var(--SCALE));
-    margin-bottom: calc( 2px * var(--SCALE));
+/* chg-s conpress text region by oki098972 */
+    //margin-top: calc( 2px * var(--SCALE));
+    //margin-bottom: calc( 2px * var(--SCALE));
+    margin-top: calc( 0px * var(--SCALE));
+    margin-bottom: calc( 0px * var(--SCALE));
+/* chg-e conpress text region by oki098972 */
     float: right;
     text-align: right;
     display: inline-block;
 }
 
 .infoBlockSection {
-    padding-top: calc( 7px * var(--SCALE));
-    padding-bottom: calc( 7px * var(--SCALE));
-    padding-left: calc( 7px * var(--SCALE));
-    padding-right: calc( 7px * var(--SCALE));
+/* chg-s conpress text region by oki098972 */
+    //padding-top: calc( 7px * var(--SCALE));
+    //padding-bottom: calc( 7px * var(--SCALE));
+    padding-top: calc( 0px * var(--SCALE));
+    padding-bottom: calc( 0px * var(--SCALE));
+/* chg-e conpress text region by oki098972 */
+/* chg-s reduce hover dialog box size by oki098972 */
+    //padding-left: calc( 7px * var(--SCALE));
+    //padding-right: calc( 7px * var(--SCALE));
+    padding-left: calc( 3px * var(--SCALE));
+    padding-right: calc( 3px * var(--SCALE));
+/* chg-e reduce hover dialog box size by oki098972 */
 }
 
 .largeText a {
@@ -687,7 +815,10 @@ table.infoSectionTable tr td {
     width: calc(100% - calc( 5px * var(--SCALE)));
     max-width:  calc(800px * var(--SCALE));
     right: calc( 85px * var(--SCALE));
-    bottom: calc( 35px * var(--SCALE));
+/* chg-s reduce hover dialog box size by oki098972 */
+    //bottom: calc( 35px * var(--SCALE));
+    bottom: calc( 50px * var(--SCALE));
+/* chg-e reduce hover dialog box size by oki098972 */
     background-color: transparent !important;
 }
 
@@ -913,3 +1044,86 @@ input{
 #replaySpeedHint{
   grid-area: speedHint;
 }
+
+/* ins-s 通報簡略化 param by oki098972 */
+.modalBo {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modalBo .innerBo {
+  //width: 100%;
+  //height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  margin: 10px;
+  display: block;
+  width: 500px;
+  height: auto;
+  border-radius: 5px;
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  padding: 20px;
+  text-align: left;
+  background-color: rgba(255, 255, 255, 0.9);
+  min-width: 400px;
+  max-width: 700px;
+  min-height: 200px;
+  max-height: 500px;
+  display: flex;
+  /* justify-content: center; */
+  justify-content: start;
+  /* align-items: center; */
+  align-items: start;
+  flex-direction: column;
+  color: #333;
+  font-size: 140%;
+  overflow: scroll;
+}
+.buttonModalBo{
+    background: #DDD;
+    color; #fff;
+    text-decoration: none;
+    color: #000;
+    text-align: center;
+    border: none;
+    border-radius: 4px;
+    display: inline-block;
+    height: 35px;
+    padding: 2px 4px;
+    //text-transform: uppercase;
+    //font-size: 75% !important;
+    font-size: 12px;
+    cursor: pointer;
+    /* transition: background-color 0.2s; */
+    margin-bottom: 5px; 
+}
+.buttonModalBoOut{
+    width: 300px;
+    height: 50px;
+    bottom: 0;
+    right: 0;
+    /* 垂直方向で中央揃え（下準備） */
+    position: absolute;
+}
+.buttonModalBo:hover{
+  background: #777;
+  opacity: 0.8;
+}
+
+.bsPopupForm>label{
+    display: block;
+    margin-left: 80px;
+}
+.bsPopupForm>label>input{
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+/* ins-e 通報簡略化 param by oki098972 */
