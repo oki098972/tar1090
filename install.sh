@@ -8,7 +8,8 @@ trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
 renice 10 $$
 
 srcdir=/run/readsb
-repo="https://github.com/wiedehopf/tar1090"
+#repo="https://github.com/wiedehopf/tar1090"
+repo="https://github.com/oki098972/tar1090"
 db_repo="https://github.com/wiedehopf/tar1090-db"
 
 # optional command line options for this install script
@@ -17,7 +18,8 @@ db_repo="https://github.com/wiedehopf/tar1090-db"
 # $3: specify install path
 # $4: specify git path as source instead of pulling from git
 
-ipath=/usr/local/share/tar1090
+#ipath=/usr/local/share/tar1090
+ipath=/usr/local/share/tar1090_972
 if [[ -n "$3" ]]; then ipath="$3"; fi
 
 if [[ -n "$4" ]] && grep -qs -e 'tar1090' "$4/install.sh"; then git_source="$4"; fi
@@ -32,9 +34,10 @@ if [[ -z "$gpath" ]]; then gpath="$ipath"; fi
 mkdir -p "$ipath"
 mkdir -p "$gpath"
 
-if useSystemd && ! id -u tar1090 &>/dev/null
+if useSystemd && ! id -u tar1090_972 &>/dev/null
 then
-    adduser --system --home "$ipath" --no-create-home --quiet tar1090 || adduser --system --home-dir "$ipath" --no-create-home tar1090
+#    adduser --system --home "$ipath" --no-create-home --quiet tar1090 || adduser --system --home-dir "$ipath" --no-create-home tar1090
+    adduser --system --home "$ipath" --no-create-home --quiet tar1090_972 || adduser --system --home-dir "$ipath" --no-create-home tar1090_972
 fi
 
 # terminate with /
@@ -86,7 +89,9 @@ fi
 
 if command -v nginx &>/dev/null
 then
-    nginx=yes
+#    nginx=yes
+# not support nginx
+    nginx=no
 fi
 
 dir=$(pwd)
@@ -146,7 +151,8 @@ if [[ "$1" == "test" ]] || [[ -n "$git_source" ]]; then
     cd "$gpath/git"
     TAR_VERSION="$(cat version)_dirty"
 else
-    VERSION_NEW=$(curl --silent --show-error "https://raw.githubusercontent.com/wiedehopf/tar1090/master/version")
+#    VERSION_NEW=$(curl --silent --show-error "https://raw.githubusercontent.com/wiedehopf/tar1090/master/version")
+    VERSION_NEW=$(curl --silent --show-error "https://raw.githubusercontent.com/oki0989972/tar1090/master/version")
     if  [[ "$(cat "$gpath/git/version" 2>/dev/null)" != "$VERSION_NEW" ]]; then
         if ! getGIT "$repo" "master" "$gpath/git"; then
             echo "Unable to download files, exiting! (Maybe try again?)"
@@ -193,11 +199,13 @@ fi
 if [[ -n $2 ]]; then
     instances="$srcdir $2"
 elif [[ -n $1 ]] && [ "$1" != "test" ] ; then
-    instances="$1 tar1090"
+#    instances="$1 tar1090"
+    instances="$1 tar1090_972"
 elif [ -f /etc/default/tar1090_instances ]; then
     instances=$(</etc/default/tar1090_instances)	
 else
-    instances="$srcdir tar1090"
+#    instances="$srcdir tar1090"
+    instances="$srcdir tar1090_972"
 fi
 
 if [[ -d /usr/local/share/adsbexchange-978 ]]; then
@@ -207,7 +215,8 @@ fi
 instances=$(echo -e "$instances" | grep -v -e '^#')
 
 
-if ! diff tar1090.sh "$ipath"/tar1090.sh &>/dev/null; then
+#if ! diff tar1090.sh "$ipath"/tar1090.sh &>/dev/null; then
+if ! diff tar1090_972.sh "$ipath"/tar1090_972.sh &>/dev/null; then
     changed=yes
     while read -r srcdir instance; do
         if [[ -z "$srcdir" || -z "$instance" ]]; then
@@ -215,15 +224,18 @@ if ! diff tar1090.sh "$ipath"/tar1090.sh &>/dev/null; then
         fi
 
         if [[ "$instance" != "tar1090" ]]; then
-            service="tar1090-$instance"
+#            service="tar1090-$instance"
+            service="tar1090_972-$instance"
         else
-            service="tar1090"
+#            service="tar1090"
+            service="tar1090_972"
         fi
         if useSystemd; then
             systemctl stop "$service" 2>/dev/null || true
         fi
     done < <(echo "$instances")
-    cp tar1090.sh "$ipath"
+#    cp tar1090.sh "$ipath"
+    cp tar1090_972.sh "$ipath"
 fi
 
 
@@ -234,12 +246,12 @@ cp html/config.js "$ipath/example_config.js"
 rm -f "$ipath/default"
 
 # create 95-tar1090-otherport.conf
-{
-    echo '# serve tar1090 directly on port 8504'
-    echo '$SERVER["socket"] == ":8504" {'
-    cat 88-tar1090.conf
-    echo '}'
-} > 95-tar1090-otherport.conf
+#{
+#    echo '# serve tar1090 directly on port 8504'
+#    echo '$SERVER["socket"] == ":8504" {'
+#    cat 88-tar1090.conf
+#    echo '}'
+#} > 95-tar1090-otherport.conf
 
 services=()
 names=""
@@ -255,12 +267,15 @@ do
     mkdir -p "$TMP"
     chmod 755 "$TMP"
 
-    if [[ "$instance" != "tar1090" ]]; then
+#    if [[ "$instance" != "tar1090" ]]; then
+    if [[ "$instance" != "tar1090_972" ]]; then
         html_path="$ipath/html-$instance"
-        service="tar1090-$instance"
+#        service="tar1090-$instance"
+        service="tar1090_972-$instance"
     else
         html_path="$ipath/html"
-        service="tar1090"
+#        service="tar1090"
+        service="tar1090_972"
     fi
     services+=("$service")
     names+="$instance "
@@ -268,33 +283,40 @@ do
     # don't overwrite existing configuration
     useSystemd && copyNoClobber default /etc/default/"$service"
 
-    sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" \
-        -e "s?/INSTANCE??g" -e "s?HTMLPATH?$html_path?g" 95-tar1090-otherport.conf
+#    sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" \
+#        -e "s?/INSTANCE??g" -e "s?HTMLPATH?$html_path?g" 95-tar1090-otherport.conf
 
     if [[ "$instance" == "webroot" ]]; then
+#        sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" \
+#            -e "s?/INSTANCE??g" -e "s?HTMLPATH?$html_path?g" 88-tar1090.conf
         sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" \
-            -e "s?/INSTANCE??g" -e "s?HTMLPATH?$html_path?g" 88-tar1090.conf
-        sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" \
-            -e "s?/INSTANCE/?/?g" -e "s?HTMLPATH?$html_path?g" nginx.conf
-        sed -i -e "s?/INSTANCE?/?g" nginx.conf
+            -e "s?/INSTANCE??g" -e "s?HTMLPATH?$html_path?g" 88-tar1090_972.conf
+#        sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" \
+#            -e "s?/INSTANCE/?/?g" -e "s?HTMLPATH?$html_path?g" nginx.conf
+#        sed -i -e "s?/INSTANCE?/?g" nginx.conf
     else
+#        sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" \
+#            -e "s?INSTANCE?$instance?g" -e "s?HTMLPATH?$html_path?g" 88-tar1090.conf
         sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" \
-            -e "s?INSTANCE?$instance?g" -e "s?HTMLPATH?$html_path?g" 88-tar1090.conf
-        sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" \
-            -e "s?INSTANCE?$instance?g" -e "s?HTMLPATH?$html_path?g" nginx.conf
+            -e "s?INSTANCE?$instance?g" -e "s?HTMLPATH?$html_path?g" 88-tar1090_972.conf
+ #       sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" \
+ #           -e "s?INSTANCE?$instance?g" -e "s?HTMLPATH?$html_path?g" nginx.conf
     fi
 
     if [[ $lighttpd == yes ]] && lighttpd -v | grep -E 'lighttpd/1.4.(5[6-9]|[6-9])' -qs; then
-        sed -i -e 's/compress.filetype/deflate.mimetypes/' 88-tar1090.conf
-        sed -i -e 's/compress.filetype/deflate.mimetypes/' 95-tar1090-otherport.conf
+#        sed -i -e 's/compress.filetype/deflate.mimetypes/' 88-tar1090.conf
+        sed -i -e 's/compress.filetype/deflate.mimetypes/' 88-tar1090_972.conf
+#        sed -i -e 's/compress.filetype/deflate.mimetypes/' 95-tar1090-otherport.conf
         if ! grep -qs -e '^[^#]*"mod_deflate"' /etc/lighttpd/lighttpd.conf /etc/lighttpd/conf-enabled/*; then
-            sed -i -e 's/^[^#]*deflate.mimetypes/#\0/' 88-tar1090.conf
-            sed -i -e 's/^[^#]*deflate.mimetypes/#\0/' 95-tar1090-otherport.conf
+#            sed -i -e 's/^[^#]*deflate.mimetypes/#\0/' 88-tar1090.conf
+            sed -i -e 's/^[^#]*deflate.mimetypes/#\0/' 88-tar1090_972.conf
+#            sed -i -e 's/^[^#]*deflate.mimetypes/#\0/' 95-tar1090-otherport.conf
         fi
     fi
 
 
-    sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" tar1090.service
+#    sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" tar1090.service
+    sed -i.orig -e "s?SOURCE_DIR?$srcdir?g" -e "s?SERVICE?${service}?g" tar1090_972.service
 
     cp -r -T html "$TMP"
     cp -r -T "$gpath/git-db/db" "$TMP/db-$DB_VERSION"
@@ -341,22 +363,24 @@ do
     if [[ $lighttpd == yes ]]; then
         # clean up broken symlinks in conf-enabled ...
         for link in /etc/lighttpd/conf-enabled/*; do [[ -e "$link" ]] || rm -f "$link"; done
-        if [[ "$otherport" != "done" ]]; then
-            cp 95-tar1090-otherport.conf /etc/lighttpd/conf-available/
-            ln -f -s /etc/lighttpd/conf-available/95-tar1090-otherport.conf /etc/lighttpd/conf-enabled/95-tar1090-otherport.conf
-            otherport="done"
-            if [ -f /etc/lighttpd/conf.d/69-skybup.conf ]; then
-                mv /etc/lighttpd/conf-enabled/95-tar1090-otherport.conf /etc/lighttpd/conf-enabled/68-tar1090-otherport.conf
-            fi
-        fi
+#        if [[ "$otherport" != "done" ]]; then
+#            cp 95-tar1090-otherport.conf /etc/lighttpd/conf-available/
+#            ln -f -s /etc/lighttpd/conf-available/95-tar1090-otherport.conf /etc/lighttpd/conf-enabled/95-tar1090-otherport.conf
+#            otherport="done"
+#            if [ -f /etc/lighttpd/conf.d/69-skybup.conf ]; then
+#                mv /etc/lighttpd/conf-enabled/95-tar1090-otherport.conf /etc/lighttpd/conf-enabled/68-tar1090-otherport.conf
+#            fi
+#        fi
         if [ -f /etc/lighttpd/conf.d/69-skybup.conf ] && [[ "$instance" == "webroot" ]]; then
             true
         elif [[ "$instance" == "webroot" ]]
         then
-            cp 88-tar1090.conf /etc/lighttpd/conf-available/99-"${service}".conf
+#            cp 88-tar1090.conf /etc/lighttpd/conf-available/99-"${service}".conf
+            cp 88-tar1090_972.conf /etc/lighttpd/conf-available/99-"${service}".conf
             ln -f -s /etc/lighttpd/conf-available/99-"${service}".conf /etc/lighttpd/conf-enabled/99-"${service}".conf
         else
-            cp 88-tar1090.conf /etc/lighttpd/conf-available/88-"${service}".conf
+#            cp 88-tar1090.conf /etc/lighttpd/conf-available/88-"${service}".conf
+            cp 88-tar1090_972.conf /etc/lighttpd/conf-available/88-"${service}".conf
             ln -f -s /etc/lighttpd/conf-available/88-"${service}".conf /etc/lighttpd/conf-enabled/88-"${service}".conf
             if [ -f /etc/lighttpd/conf.d/69-skybup.conf ]; then
                 mv /etc/lighttpd/conf-enabled/88-"${service}".conf /etc/lighttpd/conf-enabled/66-"${service}".conf
@@ -365,9 +389,11 @@ do
     fi
 
     if useSystemd; then
-        if [[ $changed == yes ]] || ! diff tar1090.service /lib/systemd/system/"${service}".service &>/dev/null
+#        if [[ $changed == yes ]] || ! diff tar1090.service /lib/systemd/system/"${service}".service &>/dev/null
+        if [[ $changed == yes ]] || ! diff tar1090_972.service /lib/systemd/system/"${service}".service &>/dev/null
         then
-            cp tar1090.service /lib/systemd/system/"${service}".service
+#            cp tar1090.service /lib/systemd/system/"${service}".service
+            cp tar1090_972.service /lib/systemd/system/"${service}".service
             if systemctl enable "${service}"
             then
                 echo "Restarting ${service} ..."
@@ -379,10 +405,12 @@ do
     fi
 
     # restore sed modified configuration files
-    mv 88-tar1090.conf.orig 88-tar1090.conf
-    mv 95-tar1090-otherport.conf.orig 95-tar1090-otherport.conf
-    mv nginx.conf.orig nginx.conf
-    mv tar1090.service.orig tar1090.service
+#    mv 88-tar1090.conf.orig 88-tar1090.conf
+    mv 88-tar1090_972.conf.orig 88-tar1090_972.conf
+#    mv 95-tar1090-otherport.conf.orig 95-tar1090-otherport.conf
+#    mv nginx.conf.orig nginx.conf
+#    mv tar1090.service.orig tar1090.service
+    mv tar1090_972.service.orig tar1090_972.service
 done < <(echo "$instances")
 
 if [[ $lighttpd == yes ]]; then
@@ -461,7 +489,6 @@ fi
 
 echo --------------
 
-
 if [[ $nginx == yes ]]; then
     echo
     echo "To configure nginx for tar1090, please add the following line(s) in the server {} section:"
@@ -477,10 +504,10 @@ if [[ $lighttpd == yes ]]; then
     for name in $names; do
         echo "All done! Webinterface available at http://$(ip route get 1.2.3.4 | grep -m1 -o -P 'src \K[0-9,.]*')/$name"
     done
-elif [[ $nginx == yes ]]; then
-    for name in $names; do
-        echo "All done! Webinterface once nginx is configured will be available at http://$(ip route get 1.2.3.4 | grep -m1 -o -P 'src \K[0-9,.]*')/$name"
-    done
+#elif [[ $nginx == yes ]]; then
+#    for name in $names; do
+#        echo "All done! Webinterface once nginx is configured will be available at http://$(ip route get 1.2.3.4 | grep -m1 -o -P 'src \K[0-9,.]*')/$name"
+#    done
 else
     echo "All done! You'll need to configure your webserver yourself, see ${ipath}/nginx-tar1090.conf for a reference nginx configuration"
 fi
