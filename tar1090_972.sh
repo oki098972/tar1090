@@ -2,7 +2,8 @@
 
 set -e
 trap 'echo "[ERROR] Error in line $LINENO when executing: $BASH_COMMAND"' ERR
-trap 'echo tar1090.sh: exiting; trap - SIGTERM; kill -- -$( ps opgid= $$ | tr -d " " ) || true; exit 0' SIGTERM SIGINT SIGHUP SIGQUIT
+#trap 'echo tar1090.sh: exiting; trap - SIGTERM; kill -- -$( ps opgid= $$ | tr -d " " ) || true; exit 0' SIGTERM SIGINT SIGHUP SIGQUIT
+trap 'echo tar1090_972.sh: exiting; trap - SIGTERM; kill -- -$( ps opgid= $$ | tr -d " " ) || true; exit 0' SIGTERM SIGINT SIGHUP SIGQUIT
 
 RUN_DIR=$1
 SRC_DIR=$2
@@ -19,7 +20,8 @@ fi
 
 if [[ -z $HISTORY_SIZE || -z $INTERVAL || -z $CHUNK_SIZE ]]
 then
-    echo "Syntax: bash tar1090.sh <runtime directory> <dump1090 source directory>"
+#    echo "Syntax: bash tar1090.sh <runtime directory> <dump1090 source directory>"
+    echo "Syntax: bash tar1090_972.sh <runtime directory> <dump1090 source directory>"
     echo "Missing some settings from environment variables, using defaults:"
     echo "history interval: 8 seconds"
     echo "history size: 450 entries"
@@ -162,7 +164,8 @@ while true; do
         now=$(date +%s%N | head -c-7)
         if (( now > next_error )); then
             if (( next_error != 0 )); then
-                echo "No aircraft.json found in $SRC_DIR during the last 30 seconds! Try restarting dump1090 or reinstalling tar1090 if you switched dump1090 to readsb!"
+#                echo "No aircraft.json found in $SRC_DIR during the last 30 seconds! Try restarting dump1090 or reinstalling tar1090 if you switched dump1090 to readsb!"
+                echo "No aircraft.json found in $SRC_DIR during the last 30 seconds! Try restarting dump1090 or reinstalling tar1090_972 if you switched dump1090 to readsb!"
                 error_printed=1
             fi
             next_error=$(( now + 10000 ))
