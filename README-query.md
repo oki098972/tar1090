@@ -1,12 +1,12 @@
 # Query parameters
 
-- The query parameters are appended to the URL you would normally use for tar1090.
+- The query parameters are appended to the URL you would normally use for tar1090_972.
 - Before the first query parameter a question mark ? is prepended, for each additional parameter an ampersand & is prepended.
-- Example: http://192.168.x.yy/tar1090/?icao=456789&enableLabels&extendedLabels=2&trackLabels&zoom=11&mapDim=0.4
+- Example: http://192.168.x.yy/tar1090_972/?icao=456789&enableLabels&extendedLabels=2&trackLabels&zoom=11&mapDim=0.4
 
 - Some parameters need a value. If no value if passed, the default one is used.
 - Some parameters do not take a value. They are active if used in the URL.(hideSideBar, hideButtons, ...).
-- Query parameters in tar1090 are not case sensitive.
+- Query parameters in tar1090_972 are not case sensitive.
 
 ## Search / filter
 
